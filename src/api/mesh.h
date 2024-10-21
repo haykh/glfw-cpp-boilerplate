@@ -4,8 +4,6 @@
 #include "api/prefabs.h"
 #include "utils/error.h"
 
-#include <glad/glad.h>
-
 #include <map>
 #include <string>
 #include <vector>

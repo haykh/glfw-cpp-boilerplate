@@ -3,11 +3,10 @@
 #include "api/mesh.h"
 #include "api/prefabs.h"
 #include "api/shader.h"
+#include "api/window.h"
 #include "utils/log.h"
 
-#include <GL/gl.h>
-
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <GLFW/glfw3.h>
 

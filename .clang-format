@@ -95,10 +95,12 @@ IncludeCategories:
     Priority: 2
   - Regex: '^\<glad\/.*\.h\>'
     Priority: 3
-  - Regex: '^\<GLFW\/.*\.h\>'
+  - Regex: '^\<glfw\/.*\.h\>'
     Priority: 4
   - Regex: '^\<glm.*\.h'
     Priority: 5
+  - Regex: "<[[:lower:].|_]+>"
+    Priority: 6
 IncludeIsMainRegex: "(Test)?$"
 IncludeIsMainSourceRegex: ""
 IndentAccessModifiers: false

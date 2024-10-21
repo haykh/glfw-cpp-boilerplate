@@ -3,7 +3,7 @@
 #include "utils/error.h"
 #include "utils/log.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <GLFW/glfw3.h>
 
@@ -45,11 +45,7 @@ namespace api {
     }
     glfwMakeContextCurrent(m_win);
     glfwSetFramebufferSizeCallback(m_win, framebuffer_size_callback);
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-      raise::error("Failed to load GLAD");
-    } else {
-      log::log(log::SUCCESS, "GLAD loaded");
-    }
+    gladLoadGL(glfwGetProcAddress);
   }
 
   Window::~Window() {

@@ -1,9 +1,7 @@
 #ifndef API_SHADER_H
 #define API_SHADER_H
 
-#include <glad/glad.h>
-
-#include <GLFW/glfw3.h>
+#include <glad/gl.h>
 
 #include <string>
 

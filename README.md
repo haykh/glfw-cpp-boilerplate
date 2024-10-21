@@ -11,7 +11,6 @@ cmake -B build
 
 ## requirements
 
-* glfw3
+* glfw3 & glad (included as a submodule)
 * glm (included as a submodule)
-* glad & KHR (included here for openGL 4.6); for other openGL versions: [https://glad.dav1d.de/](https://glad.dav1d.de/)
 * gtk (optional)

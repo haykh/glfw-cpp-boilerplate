@@ -3,9 +3,7 @@
 #include "utils/error.h"
 #include "utils/log.h"
 
-#include <glad/glad.h>
-
-#include <GLFW/glfw3.h>
+#include <glad/gl.h>
 
 #include <fstream>
 #include <sstream>

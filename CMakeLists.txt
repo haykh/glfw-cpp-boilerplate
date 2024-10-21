@@ -26,11 +26,42 @@ else()
   message(STATUS "Debug mode")
 endif()
 
-set(BUILD_EXAMPLES
-    OFF
-    CACHE BOOL "Build examples")
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIRS})
 
-find_package(glfw3 REQUIRED)
-link_libraries(glfw)
+find_package(glfw3)
+
+if(${glfw3_FOUND})
+  message(STATUS "GLFW found")
+else()
+  message(STATUS "GLFW not found, using bundled version")
+  set(BUILD_EXAMPLES
+      OFF
+      CACHE BOOL "")
+  set(BUILD_SHARED_LIBS
+      OFF
+      CACHE BOOL "")
+  set(GLFW_BUILD_EXAMPLES
+      OFF
+      CACHE BOOL "")
+  set(GLFW_BUILD_TESTS
+      OFF
+      CACHE BOOL "")
+  set(GLFW_BUILD_DOCS
+      OFF
+      CACHE BOOL "")
+  set(GLFW_INSTALL
+      OFF
+      CACHE BOOL "")
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw)
+endif()
+
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/deps ${CMAKE_CURRENT_SOURCE_DIR}/lib/glm)
+
+if(MSVC)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
+endif()
 
 add_subdirectory(src)

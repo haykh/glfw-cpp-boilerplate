@@ -1,9 +1,9 @@
 set(EXECUTABLE ${PROJECT_NAME}.xc)
 
-file(GLOB_RECURSE SOURCES "*.cpp" "*.c")
+file(GLOB_RECURSE SOURCES "*.cpp")
 
 add_executable(${EXECUTABLE} ${SOURCES})
-target_include_directories(
-  ${EXECUTABLE}
-  PRIVATE ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/include/glm
-          ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_include_directories(${EXECUTABLE} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(${EXECUTABLE} ${OPENGL_LIBRARIES} glfw ${GLFW_LIBRARIES})
