@@ -1,4 +1,8 @@
-set(EXECUTABLE ${PROJECT_NAME}.xc)
+if(MSVC)
+  set(EXECUTABLE ${PROJECT_NAME})
+else()
+  set(EXECUTABLE ${PROJECT_NAME}.xc)
+endif()
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 
