@@ -29,7 +29,7 @@ endif()
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS})
 
-find_package(glfw3)
+find_package(glfw3 QUIET)
 
 if(${glfw3_FOUND})
   message(STATUS "GLFW found")
