@@ -12,18 +12,20 @@ namespace engine {
   class Window {
   private:
     GLFWwindow* m_win;
+    float       m_col_bg[4];
     int         m_winWidth, m_winHeight;
-    const char* m_glsl_version = "#version 150";
 
   public:
     Window(int                width,
            int                height,
            const std::string& name,
            int                swapInterval,
+           float              col_bg[4],
            bool               isResizable = true);
     ~Window();
     void processInput();
     void unuse();
+    void clear();
 
     [[nodiscard]]
     auto windowShouldClose() const -> int {
@@ -33,11 +35,6 @@ namespace engine {
     [[nodiscard]]
     auto get_window() const -> GLFWwindow* {
       return m_win;
-    }
-
-    [[nodiscard]]
-    auto get_glsl_version() const -> const char* {
-      return m_glsl_version;
     }
   };
 

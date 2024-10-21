@@ -9,13 +9,19 @@
 
 namespace engine {
 
+  void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+  }
+
   Window::Window(int                width,
                  int                height,
                  const std::string& name,
                  int                swapInterval,
+                 float              col_bg[4],
                  bool               isResizable)
     : m_winWidth(width)
-    , m_winHeight(height) {
+    , m_winHeight(height)
+    , m_col_bg { col_bg[0], col_bg[1], col_bg[2], col_bg[3] } {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -36,7 +42,8 @@ namespace engine {
       log::log(log::SUCCESS, "Window opened");
     }
     glfwMakeContextCurrent(m_win);
-    glfwSwapInterval(swapInterval);
+    glfwSetFramebufferSizeCallback(m_win, framebuffer_size_callback);
+    // glfwSwapInterval(swapInterval);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
       raise::error("Failed to load GLAD");
     } else {
@@ -52,6 +59,11 @@ namespace engine {
     if (glfwGetKey(m_win, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(m_win, true);
     }
+  }
+
+  void Window::clear() {
+    glClearColor(m_col_bg[0], m_col_bg[1], m_col_bg[2], m_col_bg[3]);
+    glClear(GL_COLOR_BUFFER_BIT);
   }
 
   void Window::unuse() {

@@ -23,6 +23,12 @@ namespace log {
            int         = __builtin_LINE(),
            const char* = __builtin_FUNCTION());
 
+  void log(LogLevel,
+           const std::string&,
+           const char* = FILENAME(__builtin_FILE()),
+           int         = __builtin_LINE(),
+           const char* = __builtin_FUNCTION());
+
 } // namespace log
 
 #undef FILENAME

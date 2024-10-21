@@ -1,9 +1,9 @@
 #include "log.h"
 
 #include "colors.h"
-
 #include <cstdio>
 #include <stdexcept>
+#include <string>
 
 namespace log {
 
@@ -61,6 +61,14 @@ namespace log {
             func,
             msg,
             color::get(color::RESET));
+  }
+
+  void log(LogLevel           level,
+           const std::string& msg,
+           const char*        file,
+           int                line,
+           const char*        func) {
+    log(level, msg.c_str(), file, line, func);
   }
 
 } // namespace log

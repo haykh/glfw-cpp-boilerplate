@@ -133,7 +133,7 @@ PenaltyBreakFirstLessLess: 25
 PenaltyBreakOpenParenthesis: 10
 PenaltyBreakString: 1000
 PenaltyBreakTemplateDeclaration: 10
-PenaltyExcessCharacter: 20
+PenaltyExcessCharacter: 100
 PenaltyIndentedWhitespace: 0
 PenaltyReturnTypeOnItsOwnLine: 200
 PointerAlignment: Left
