@@ -4,7 +4,7 @@
 #include <string>
 
 #if defined(_MSC_VER)
-  #include <libloaderapi.h>
+  #include <windows.h>
 #else
   #include <unistd.h>
 #endif

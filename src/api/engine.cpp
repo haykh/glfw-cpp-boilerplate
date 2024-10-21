@@ -43,8 +43,9 @@ namespace engine {
 
     api::ShaderProgram shader("rectangle");
     const auto         exe_path = path::exeDir();
-    shader.readShadersFromPaths(exe_path / "shaders" / "test.vert",
-                                exe_path / "shaders" / "test.frag");
+    shader.readShadersFromPaths(
+      (exe_path / "shaders" / "test.vert").generic_string(),
+      (exe_path / "shaders" / "test.frag").generic_string());
     shader.compile();
     shader.link();
 
