@@ -119,8 +119,8 @@ namespace api {
   void ShaderProgram::link() {
     if (is_linked()) {
       raise::error("shader program already linked");
-    } else if (not m_vertexShader.is_compiled() ||
-               not m_fragmentShader.is_compiled()) {
+    } else if (!m_vertexShader.is_compiled() ||
+               !m_fragmentShader.is_compiled()) {
       raise::error(
         "vertex and fragment shaders must be compiled before linking");
     }
