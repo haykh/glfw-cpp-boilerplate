@@ -9,8 +9,8 @@ namespace api {
 
   template <GLenum S>
   class Shader {
-    const unsigned int m_id;
     const std::string  m_label;
+    const unsigned int m_id;
     std::string        m_source;
     bool               m_source_set { false };
     bool               m_compiled { false };
@@ -52,8 +52,8 @@ namespace api {
   };
 
   class ShaderProgram {
-    const unsigned int         m_id;
     const std::string          m_label;
+    const unsigned int         m_id;
     bool                       m_linked { false };
     Shader<GL_VERTEX_SHADER>   m_vertexShader;
     Shader<GL_FRAGMENT_SHADER> m_fragmentShader;

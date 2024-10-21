@@ -27,7 +27,6 @@ namespace engine {
     m_window = std::make_unique<api::Window>((int)(win_width * scale / 2.0f),
                                              (int)(win_height * scale / 2.0f),
                                              "engine_window",
-                                             1,
                                              col_bg,
                                              resizable);
   }

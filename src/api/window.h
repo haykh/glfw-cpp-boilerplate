@@ -11,14 +11,13 @@ namespace api {
   class Window {
   private:
     GLFWwindow* m_win;
-    float       m_col_bg[4];
     int         m_winWidth, m_winHeight;
+    float       m_col_bg[4];
 
   public:
     Window(int                width,
            int                height,
            const std::string& name,
-           int                swapInterval,
            float              col_bg[4],
            bool               isResizable = true);
     ~Window();

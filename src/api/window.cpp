@@ -11,14 +11,13 @@ namespace api {
   namespace log   = utils;
   namespace raise = utils;
 
-  void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+  void framebuffer_size_callback(GLFWwindow*, int width, int height) {
     glViewport(0, 0, width, height);
   }
 
   Window::Window(int                width,
                  int                height,
                  const std::string& name,
-                 int                swapInterval,
                  float              col_bg[4],
                  bool               isResizable)
     : m_winWidth(width)

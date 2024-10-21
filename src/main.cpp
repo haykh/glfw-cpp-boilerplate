@@ -9,7 +9,7 @@
 
 namespace raise = utils;
 
-auto main(int argc, char* argv[]) -> int {
+auto main(int, char**) -> int {
   if (glfwInit()) {
     try {
       auto engine = engine::Engine();

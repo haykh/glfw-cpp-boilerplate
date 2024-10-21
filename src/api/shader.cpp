@@ -90,9 +90,9 @@ namespace api {
 
   ShaderProgram::ShaderProgram(const std::string& label)
     : m_label { label }
+    , m_id { glCreateProgram() }
     , m_vertexShader { label + " vertex" }
-    , m_fragmentShader { label + " fragment" }
-    , m_id { glCreateProgram() } {}
+    , m_fragmentShader { label + " fragment" } {}
 
   ShaderProgram::~ShaderProgram() {
     if (is_linked()) {
