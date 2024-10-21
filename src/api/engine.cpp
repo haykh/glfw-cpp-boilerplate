@@ -10,6 +10,7 @@
 #include <GLFW/glfw3.h>
 
 namespace engine {
+
   auto createVertexBuffers(const std::string&  name,
                            const float*        vertices,
                            std::size_t         v_size,

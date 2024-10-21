@@ -19,14 +19,14 @@ namespace api {
 
   public:
     Shader(const std::string&);
-
     ~Shader();
 
     void readShaderFromPath(const std::string&);
-    void compile();
-
     void setShaderSource(const std::string& source);
 
+    void compile();
+
+    // accessors
     [[nodiscard]]
     auto id() const noexcept -> unsigned int {
       return m_id;
@@ -73,8 +73,12 @@ namespace api {
     void link();
     void use() const;
 
+    // uniforms
     void setUniform1f(const std::string& name, float value);
+    void setUniform1i(const std::string& name, int value);
+    void setUniform1b(const std::string& name, bool value);
 
+    // accessors
     [[nodiscard]]
     auto id() const noexcept -> unsigned int {
       return m_id;

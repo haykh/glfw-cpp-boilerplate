@@ -36,6 +36,7 @@ namespace api {
     if (is_source_set()) {
       raise::error("shader source already set");
     }
+    // check filenames
     if constexpr (S == GL_VERTEX_SHADER) {
       if (path.find(".vert") == std::string::npos) {
         raise::error("vertex shader must have .vert extension");
@@ -92,7 +93,7 @@ namespace api {
     , m_id { glCreateProgram() } {}
 
   ShaderProgram::~ShaderProgram() {
-    if (m_linked) {
+    if (is_linked()) {
       glDeleteProgram(id());
     }
   }
@@ -147,9 +148,15 @@ namespace api {
     glUniform1f(glGetUniformLocation(id(), name.c_str()), value);
   }
 
+  void ShaderProgram::setUniform1i(const std::string& name, int value) {
+    glUniform1i(glGetUniformLocation(id(), name.c_str()), value);
+  }
+
+  void ShaderProgram::setUniform1b(const std::string& name, bool value) {
+    glUniform1i(glGetUniformLocation(id(), name.c_str()), value);
+  }
+
   template class Shader<GL_VERTEX_SHADER>;
   template class Shader<GL_FRAGMENT_SHADER>;
-
-  // template void ShaderProgram::setUniform(const std::string&, float);
 
 } // namespace api
