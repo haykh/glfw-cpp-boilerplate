@@ -5,6 +5,7 @@
 #include "api/shader.h"
 #include "api/window.h"
 #include "utils/log.h"
+#include "utils/paths.h"
 
 #include <glad/gl.h>
 
@@ -15,7 +16,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace engine {
-  namespace log = utils;
+  namespace log  = utils;
+  namespace path = utils;
 
   Engine::Engine(float scale,
                  int   win_width,
@@ -40,9 +42,9 @@ namespace engine {
                                             100.0f);
 
     api::ShaderProgram shader("rectangle");
-    shader.readShadersFromPaths(
-      "/home/hayk/Tinkering/glfw/src/shaders/test.vert",
-      "/home/hayk/Tinkering/glfw/src/shaders/test.frag");
+    const auto         exe_path = path::exeDir();
+    shader.readShadersFromPaths(exe_path / "shaders" / "test.vert",
+                                exe_path / "shaders" / "test.frag");
     shader.compile();
     shader.link();
 

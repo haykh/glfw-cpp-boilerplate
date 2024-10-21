@@ -47,6 +47,7 @@ namespace api {
         raise::error("fragment shader must have .frag extension");
       }
     }
+    log::log(log::DEBUG, "reading shader file : " + path);
     std::string   shader_src;
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
