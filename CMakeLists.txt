@@ -2,16 +2,18 @@ cmake_minimum_required(VERSION 3.16)
 
 set(PROJECT_NAME "glfw_boilerplate")
 
-project(${PROJECT_NAME}
-        VERSION 0.0.1
-        DESCRIPTION "A simple boilerplate for GLFW"
-        LANGUAGES CXX
-)
+project(
+  ${PROJECT_NAME}
+  VERSION 0.0.1
+  DESCRIPTION "A simple boilerplate for GLFW"
+  LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(DEBUG OFF CACHE BOOL "Debug mode")
+set(DEBUG
+    OFF
+    CACHE BOOL "Debug mode")
 
 if(${DEBUG} STREQUAL "OFF")
   set(CMAKE_BUILD_TYPE Release)
@@ -24,7 +26,9 @@ else()
   message(STATUS "Debug mode")
 endif()
 
-set(BUILD_EXAMPLES OFF CACHE BOOL "Build examples")
+set(BUILD_EXAMPLES
+    OFF
+    CACHE BOOL "Build examples")
 
 find_package(glfw3 REQUIRED)
 link_libraries(glfw)

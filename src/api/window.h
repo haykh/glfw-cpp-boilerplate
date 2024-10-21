@@ -1,11 +1,11 @@
 #ifndef API_WINDOW_H
 #define API_WINDOW_H
 
-#include <string>
-
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
+
+#include <string>
 
 namespace api {
 
@@ -27,14 +27,20 @@ namespace api {
     void unuse();
     void clear();
 
+    // accessors
     [[nodiscard]]
-    auto windowShouldClose() const -> int {
+    auto windowShouldClose() const noexcept -> int {
       return glfwWindowShouldClose(m_win);
     }
 
     [[nodiscard]]
-    auto get_window() const -> GLFWwindow* {
+    auto window() const noexcept -> GLFWwindow* {
       return m_win;
+    }
+
+    [[nodiscard]]
+    auto aspect() const noexcept -> float {
+      return (float)m_winWidth / (float)m_winHeight;
     }
   };
 

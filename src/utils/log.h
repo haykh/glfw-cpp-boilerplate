@@ -6,7 +6,7 @@
 #define FILENAME(file)                                                         \
   (std::string(file).substr(std::string(file).find_last_of("/\\") + 1).c_str())
 
-namespace log {
+namespace utils {
 
   enum LogLevel {
     DEBUG,
@@ -29,7 +29,7 @@ namespace log {
            int         = __builtin_LINE(),
            const char* = __builtin_FUNCTION()) noexcept;
 
-} // namespace log
+} // namespace utils
 
 #undef FILENAME
 #endif // UTILS_LOG_H

@@ -1,11 +1,12 @@
 #include "log.h"
 
 #include "colors.h"
+
 #include <cstdio>
 #include <stdexcept>
 #include <string>
 
-namespace log {
+namespace utils {
 
   auto logLevel2Color(LogLevel level) -> const char* {
     switch (level) {
@@ -71,4 +72,4 @@ namespace log {
     log(level, msg.c_str(), file, line, func);
   }
 
-} // namespace log
+} // namespace utils

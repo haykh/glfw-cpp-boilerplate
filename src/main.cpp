@@ -1,6 +1,8 @@
 #include "api/engine.h"
 #include "utils/error.h"
 
+namespace raise = utils;
+
 auto main(int argc, char* argv[]) -> int {
   if (glfwInit()) {
     try {

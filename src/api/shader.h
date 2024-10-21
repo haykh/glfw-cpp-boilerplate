@@ -1,11 +1,11 @@
 #ifndef API_SHADER_H
 #define API_SHADER_H
 
-#include <string>
-
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
+
+#include <string>
 
 namespace api {
 

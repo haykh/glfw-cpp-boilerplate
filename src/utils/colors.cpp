@@ -3,7 +3,7 @@
 #include <cstring>
 #include <string>
 
-namespace color {
+namespace utils::color {
 
   auto strip(const std::string& msg) noexcept -> std::string {
     static constexpr const char* all[] = {
@@ -63,4 +63,4 @@ namespace color {
     }
   }
 
-} // namespace color
+} // namespace utils::color

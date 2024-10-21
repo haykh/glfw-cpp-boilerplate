@@ -2,6 +2,7 @@
 #define API_ENGINE_H
 
 #include "api/window.h"
+
 #include <memory>
 
 namespace engine {

@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace color {
+namespace utils::color {
 
   enum Color {
     RESET,
@@ -29,6 +29,6 @@ namespace color {
 
   auto get(Color) noexcept -> const char*;
 
-} // namespace color
+} // namespace utils::color
 
 #endif // UTILS_COLORS_H

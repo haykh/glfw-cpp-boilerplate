@@ -34,3 +34,7 @@
 build/
 temp/
 .cache/
+
+compile_commands.json
+out/
+tags

@@ -2,14 +2,17 @@
 
 #include "utils/error.h"
 #include "utils/log.h"
-#include <fstream>
-#include <sstream>
 
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
 
+#include <fstream>
+#include <sstream>
+
 namespace api {
+  namespace log   = utils;
+  namespace raise = utils;
 
   template <GLenum S>
   Shader<S>::Shader(const std::string& label)
@@ -116,7 +119,7 @@ namespace api {
   }
 
   void ShaderProgram::link() {
-    if (m_linked) {
+    if (is_linked()) {
       raise::error("shader program already linked");
     } else if (not m_vertexShader.is_compiled() ||
                not m_fragmentShader.is_compiled()) {
@@ -141,7 +144,11 @@ namespace api {
   }
 
   void ShaderProgram::use() const {
-    glUseProgram(id());
+    if (is_linked()) {
+      glUseProgram(id());
+    } else {
+      raise::error("shader program not linked");
+    }
   }
 
   void ShaderProgram::setUniform1f(const std::string& name, float value) {
