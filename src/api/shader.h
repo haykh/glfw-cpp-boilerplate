@@ -1,9 +1,15 @@
 #ifndef API_SHADER_H
 #define API_SHADER_H
 
+#include "api/camera.h"
+#include "api/mesh.h"
+
 #include <glad/gl.h>
 
+#include <glm/glm.hpp>
+
 #include <string>
+#include <vector>
 
 namespace api {
 
@@ -20,33 +26,33 @@ namespace api {
     ~Shader();
 
     void readShaderFromPath(const std::string&);
-    void setShaderSource(const std::string& source);
+    void setShaderSource(const std::string&);
 
     void compile();
 
     // accessors
     [[nodiscard]]
-    auto id() const noexcept -> unsigned int {
+    auto id() const -> unsigned int {
       return m_id;
     }
 
     [[nodiscard]]
-    auto label() const noexcept -> const std::string& {
+    auto label() const -> const std::string& {
       return m_label;
     }
 
     [[nodiscard]]
-    auto source() const noexcept -> const std::string& {
+    auto source() const -> const std::string& {
       return m_source;
     }
 
     [[nodiscard]]
-    auto is_source_set() const noexcept -> bool {
+    auto is_source_set() const -> bool {
       return m_source_set;
     }
 
     [[nodiscard]]
-    auto is_compiled() const noexcept -> bool {
+    auto is_compiled() const -> bool {
       return m_compiled;
     }
   };
@@ -62,33 +68,34 @@ namespace api {
     ShaderProgram(const std::string&);
     ~ShaderProgram();
 
-    void readShadersFromPaths(const std::string& vertex,
-                              const std::string& fragment);
-    void setShaderSources(const std::string& vertex,
-                          const std::string& fragment);
+    void readShadersFromPaths(const std::string&, const std::string&);
+    void setShaderSources(const std::string&, const std::string&);
 
     void compile();
     void link();
     void use() const;
 
+    void render(const std::vector<const Mesh*>&, const Camera&) const;
+
     // uniforms
-    void setUniform1f(const std::string& name, float value);
-    void setUniform1i(const std::string& name, int value);
-    void setUniform1b(const std::string& name, bool value);
+    void setUniform1f(const std::string&, float) const;
+    void setUniform1i(const std::string&, int) const;
+    void setUniform1b(const std::string&, bool) const;
+    void setUniformMatrix4fv(const std::string&, const glm::mat4&) const;
 
     // accessors
     [[nodiscard]]
-    auto id() const noexcept -> unsigned int {
+    auto id() const -> unsigned int {
       return m_id;
     }
 
     [[nodiscard]]
-    auto label() const noexcept -> const std::string& {
+    auto label() const -> const std::string& {
       return m_label;
     }
 
     [[nodiscard]]
-    auto is_linked() const noexcept -> bool {
+    auto is_linked() const -> bool {
       return m_linked;
     }
   };

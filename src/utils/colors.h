@@ -25,9 +25,9 @@ namespace utils::color {
     BRIGHT_WHITE
   };
 
-  auto strip(const std::string& msg) noexcept -> std::string;
+  auto strip(const std::string& msg) -> std::string;
 
-  auto get(Color) noexcept -> const char*;
+  auto get(Color) -> const char*;
 
 } // namespace utils::color
 

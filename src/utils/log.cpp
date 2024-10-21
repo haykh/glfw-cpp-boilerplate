@@ -51,7 +51,7 @@ namespace utils {
            const char* msg,
            const char* file,
            int         line,
-           const char* func) noexcept {
+           const char* func) {
     fprintf(level != ERROR ? stdout : stderr,
             "%s%-10s%-8s [%s@%d in %s]\n:> %s%s\n",
             logLevel2Color(level),
@@ -68,7 +68,7 @@ namespace utils {
            const std::string& msg,
            const char*        file,
            int                line,
-           const char*        func) noexcept {
+           const char*        func) {
     log(level, msg.c_str(), file, line, func);
   }
 

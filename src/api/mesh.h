@@ -4,6 +4,8 @@
 #include "api/prefabs.h"
 #include "utils/error.h"
 
+#include <glm/glm.hpp>
+
 #include <map>
 #include <string>
 #include <vector>
@@ -16,6 +18,8 @@ namespace api {
     std::vector<float>                  m_vertices;
     std::vector<unsigned int>           m_indices;
     std::map<std::string, unsigned int> m_buffers;
+
+    glm::mat4 m_transform { 1.0f };
 
   public:
     Mesh(const std::string&               name,
@@ -30,9 +34,10 @@ namespace api {
 
     ~Mesh();
 
-    void genBuffers();
-    void bind();
-    void render();
+    // setters
+    void setTransform(const glm::mat4& transform) {
+      m_transform = transform;
+    }
 
     // accessors
     [[nodiscard]]
@@ -44,9 +49,19 @@ namespace api {
     }
 
     [[nodiscard]]
-    auto name() const noexcept -> const std::string& {
+    auto name() const -> const std::string& {
       return m_name;
     }
+
+    [[nodiscard]]
+    auto transform() const -> glm::mat4 {
+      return m_transform;
+    }
+
+    // methods
+    void genBuffers();
+    void bind() const;
+    void render() const;
   };
 
 } // namespace api

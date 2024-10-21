@@ -5,8 +5,13 @@
 
 #include <glad/gl.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <fstream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace api {
   namespace log   = utils;
@@ -150,16 +155,34 @@ namespace api {
     }
   }
 
-  void ShaderProgram::setUniform1f(const std::string& name, float value) {
+  void ShaderProgram::render(const std::vector<const Mesh*>& meshes,
+                             const Camera&                   camera) const {
+    setUniformMatrix4fv("view", camera.view());
+    setUniformMatrix4fv("projection", camera.project());
+    for (const auto& mesh : meshes) {
+      setUniformMatrix4fv("model", mesh->transform());
+      mesh->render();
+    }
+  }
+
+  void ShaderProgram::setUniform1f(const std::string& name, float value) const {
     glUniform1f(glGetUniformLocation(id(), name.c_str()), value);
   }
 
-  void ShaderProgram::setUniform1i(const std::string& name, int value) {
+  void ShaderProgram::setUniform1i(const std::string& name, int value) const {
     glUniform1i(glGetUniformLocation(id(), name.c_str()), value);
   }
 
-  void ShaderProgram::setUniform1b(const std::string& name, bool value) {
+  void ShaderProgram::setUniform1b(const std::string& name, bool value) const {
     glUniform1i(glGetUniformLocation(id(), name.c_str()), value);
+  }
+
+  void ShaderProgram::setUniformMatrix4fv(const std::string& name,
+                                          const glm::mat4&   value) const {
+    glUniformMatrix4fv(glGetUniformLocation(id(), name.c_str()),
+                       1,
+                       GL_FALSE,
+                       glm::value_ptr(value));
   }
 
   template class Shader<GL_VERTEX_SHADER>;

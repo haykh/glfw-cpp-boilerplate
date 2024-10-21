@@ -43,11 +43,11 @@ namespace api {
     };
   }
 
-  void Mesh::bind() {
+  void Mesh::bind() const {
     glBindVertexArray(buffer("VAO"));
   }
 
-  void Mesh::render() {
+  void Mesh::render() const {
     glDrawElements(GL_TRIANGLES,
                    static_cast<GLsizei>(m_indices.size()),
                    GL_UNSIGNED_INT,

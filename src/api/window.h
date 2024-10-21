@@ -27,17 +27,17 @@ namespace api {
 
     // accessors
     [[nodiscard]]
-    auto windowShouldClose() const noexcept -> int {
+    auto windowShouldClose() const -> int {
       return glfwWindowShouldClose(m_win);
     }
 
     [[nodiscard]]
-    auto window() const noexcept -> GLFWwindow* {
+    auto window() const -> GLFWwindow* {
       return m_win;
     }
 
     [[nodiscard]]
-    auto aspect() const noexcept -> float {
+    auto aspect() const -> float {
       return (float)m_winWidth / (float)m_winHeight;
     }
   };
