@@ -2,6 +2,7 @@
 
 #include "utils/error.h"
 #include "utils/log.h"
+#include <map>
 #include <string>
 
 #include <glad/glad.h>
@@ -34,21 +35,34 @@ namespace shaders {
     return shaderProgram;
   }
 
-  auto createVAO(const std::string& name,
-                 const float*       vertices,
-                 std::size_t        size) -> unsigned int {
-    unsigned int VBO, VAO;
+  auto createVertexBuffers(const std::string&  name,
+                           const float*        vertices,
+                           std::size_t         v_size,
+                           const unsigned int* indices,
+                           std::size_t         i_size)
+    -> std::map<std::string, unsigned int> {
+    unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
     glBindVertexArray(VAO);
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, v_size, vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, i_size, indices, GL_STATIC_DRAW);
+
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    return VAO;
+
+    return {
+      {"VAO", VAO},
+      {"VBO", VBO},
+      {"EBO", EBO}
+    };
   }
 
   void checkCompilation(unsigned int id, const std::string& shader) {

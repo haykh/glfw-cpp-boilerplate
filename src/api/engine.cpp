@@ -2,6 +2,7 @@
 
 #include "utils/log.h"
 #include "utils/shaders.h"
+#include <GL/gl.h>
 
 #include <glad/glad.h>
 
@@ -42,11 +43,14 @@ namespace engine {
                                                       vertexShaderSource,
                                                       fragmentShaderSource);
 
-    // configure vertex data
-    float vertices[] = {
-      -0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f
-    };
-    auto VAO = shaders::createVAO("triangle", vertices, sizeof(vertices));
+    float        vertices[] = { 0.5f,  0.5f,  0.0f, 0.5f,  -0.5f, 0.0f,
+                                -0.5f, -0.5f, 0.0f, -0.5f, 0.5f,  0.0f };
+    unsigned int indices[]  = { 0, 1, 3, 1, 2, 3 };
+    auto         buffers    = shaders::createVertexBuffers("triangle",
+                                                vertices,
+                                                sizeof(vertices),
+                                                indices,
+                                                sizeof(indices));
 
     log::log(log::INFO, "starting render loop");
 
@@ -56,12 +60,17 @@ namespace engine {
 
       // render stuff here >>>
       glUseProgram(shaderProgram);
-      glBindVertexArray(VAO);
-      glDrawArrays(GL_TRIANGLES, 0, 3);
+      glBindVertexArray(buffers.at("VAO"));
+      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
       // finish rendering stuff <<<
 
       m_window->unuse();
     }
+
+    glDeleteVertexArrays(1, &buffers.at("VAO"));
+    glDeleteBuffers(1, &buffers.at("VBO"));
+    glDeleteBuffers(1, &buffers.at("EBO"));
+    glDeleteProgram(shaderProgram);
   }
 
 } // namespace engine
