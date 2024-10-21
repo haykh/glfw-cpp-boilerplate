@@ -7,7 +7,7 @@
 namespace engine {
 
   class Engine {
-    std::unique_ptr<Window> m_window;
+    std::unique_ptr<api::Window> m_window;
 
   public:
     Engine(float scale      = 1.0f,

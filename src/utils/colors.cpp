@@ -5,7 +5,7 @@
 
 namespace color {
 
-  auto strip(const std::string& msg) -> std::string {
+  auto strip(const std::string& msg) noexcept -> std::string {
     static constexpr const char* all[] = {
       "\033[0m",  "\033[30m", "\033[31m", "\033[32m", "\033[33m", "\033[34m",
       "\033[35m", "\033[36m", "\033[37m", "\033[90m", "\033[91m", "\033[92m",
@@ -22,7 +22,7 @@ namespace color {
     return msg_nocol;
   }
 
-  auto get(Color c) -> const char* {
+  auto get(Color c) noexcept -> const char* {
     switch (c) {
       case RESET:
         return "\033[0m";

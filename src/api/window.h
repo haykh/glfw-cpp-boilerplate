@@ -7,7 +7,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace engine {
+namespace api {
 
   class Window {
   private:
@@ -38,6 +38,6 @@ namespace engine {
     }
   };
 
-} // namespace engine
+} // namespace api
 
 #endif // API_WINDOW_H

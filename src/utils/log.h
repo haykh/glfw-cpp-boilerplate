@@ -21,13 +21,13 @@ namespace log {
            const char*,
            const char* = FILENAME(__builtin_FILE()),
            int         = __builtin_LINE(),
-           const char* = __builtin_FUNCTION());
+           const char* = __builtin_FUNCTION()) noexcept;
 
   void log(LogLevel,
            const std::string&,
            const char* = FILENAME(__builtin_FILE()),
            int         = __builtin_LINE(),
-           const char* = __builtin_FUNCTION());
+           const char* = __builtin_FUNCTION()) noexcept;
 
 } // namespace log
 

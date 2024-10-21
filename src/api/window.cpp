@@ -7,7 +7,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace engine {
+namespace api {
 
   void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -71,4 +71,4 @@ namespace engine {
     glfwPollEvents();
   }
 
-} // namespace engine
+} // namespace api
