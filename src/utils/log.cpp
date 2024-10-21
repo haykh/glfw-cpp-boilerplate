@@ -53,7 +53,7 @@ namespace utils {
            int         line,
            const char* func) noexcept {
     fprintf(level != ERROR ? stdout : stderr,
-            "%s%-10s%-8s [%s@%d in %s]\n└> %s%s\n",
+            "%s%-10s%-8s [%s@%d in %s]\n:> %s%s\n",
             logLevel2Color(level),
             __TIME__,
             logLevel2Str(level),
