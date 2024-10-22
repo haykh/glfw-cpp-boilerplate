@@ -11,10 +11,6 @@ namespace api {
   namespace log   = utils;
   namespace raise = utils;
 
-  void framebuffer_size_callback(GLFWwindow*, int width, int height) {
-    glViewport(0, 0, width, height);
-  }
-
   Window::Window(int                width,
                  int                height,
                  const std::string& name,
@@ -32,6 +28,7 @@ namespace api {
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+
     m_win = glfwCreateWindow(m_winWidth,
                              m_winHeight,
                              name.c_str(),
@@ -42,19 +39,10 @@ namespace api {
     } else {
       log::log(log::SUCCESS, "Window opened");
     }
-    glfwMakeContextCurrent(m_win);
-    glfwSetFramebufferSizeCallback(m_win, framebuffer_size_callback);
-    gladLoadGL(glfwGetProcAddress);
   }
 
   Window::~Window() {
     glfwDestroyWindow(m_win);
-  }
-
-  void Window::processInput() {
-    if (glfwGetKey(m_win, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-      glfwSetWindowShouldClose(m_win, true);
-    }
   }
 
   void Window::clear() {

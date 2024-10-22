@@ -21,7 +21,13 @@ namespace api {
            float              col_bg[4],
            bool               isResizable = true);
     ~Window();
-    void processInput();
+
+    void processInput() {
+      if (glfwGetKey(m_win, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(m_win, true);
+      }
+    }
+
     void unuse();
     void clear();
 

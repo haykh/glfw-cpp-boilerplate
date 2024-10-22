@@ -12,8 +12,7 @@ namespace raise = utils;
 auto main(int, char**) -> int {
   if (glfwInit()) {
     try {
-      auto engine = engine::Engine();
-      engine.renderLoop();
+      engine::RenderLoop();
       glfwTerminate();
     } catch (const std::exception& e) {
       glfwTerminate();

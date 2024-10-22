@@ -7,6 +7,7 @@
 #include "api/window.h"
 #include "utils/log.h"
 #include "utils/paths.h"
+#include "utils/ticker.h"
 
 #include <glad/gl.h>
 
@@ -19,25 +20,53 @@ namespace engine {
   namespace log  = utils;
   namespace path = utils;
 
-  Engine::Engine(float scale,
-                 int   win_width,
-                 int   win_height,
-                 float col_bg[4],
-                 bool  resizable)
-    : m_window { std::make_unique<api::Window>((int)(win_width * scale / 2.0f),
-                                               (int)(win_height * scale / 2.0f),
-                                               "engine_window",
-                                               col_bg,
-                                               resizable) } {}
+  void RenderLoop(float scale,
+                  int   win_width,
+                  int   win_height,
+                  float col_bg[4],
+                  bool  resizable) {
+    api::Window window { (int)(win_width * scale / 2.0f),
+                         (int)(win_height * scale / 2.0f),
+                         "engine_window",
+                         col_bg,
+                         resizable };
+    api::Camera camera;
+    camera.setAspect(window.aspect());
+    camera.setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
 
-  void Engine::renderLoop() {
+    auto framebuffer_size_callback = [](GLFWwindow*, int width, int height) {
+      glViewport(0, 0, width, height);
+    };
+
+    static bool         firstMouse = true;
+    static float        lastX      = 0.0f;
+    static float        lastY      = 0.0f;
+    static api::Camera* cam        = &camera;
+
+    auto mouse_callback = [](GLFWwindow*, double xPos, double yPos) {
+      if (firstMouse) {
+        firstMouse = false;
+        lastX      = xPos;
+        lastY      = yPos;
+      }
+      float xOffset = (xPos - lastX) * cam->Sensitivity;
+      float yOffset = (lastY - yPos) * cam->Sensitivity;
+      cam->setYaw(cam->yaw() + xOffset);
+      cam->setPitch(cam->pitch() + yOffset);
+      lastX = xPos;
+      lastY = yPos;
+    };
+
+    glfwMakeContextCurrent(window.window());
+
+    glfwSetFramebufferSizeCallback(window.window(), framebuffer_size_callback);
+    glfwSetCursorPosCallback(window.window(), mouse_callback);
+    glfwSetInputMode(window.window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    gladLoadGL(glfwGetProcAddress);
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
-
-    api::Camera camera;
-    camera.setTarget(glm::vec3(0.0f, 0.0f, 0.0f));
-    camera.setAspect(m_window->aspect());
-    camera.setStare(true);
 
     api::ShaderProgram shader("rectangle");
     const auto         exe_path = path::exeDir();
@@ -52,25 +81,27 @@ namespace engine {
     cube.bind();
 
     log::log(log::INFO, "starting render loop");
-    while (!m_window->windowShouldClose()) {
-      m_window->processInput();
-      m_window->clear();
 
-      // render stuff here >>>
+    utils::Ticker ticker;
+    while (!window.windowShouldClose()) {
+      ticker.tick();
+
+      window.processInput();
+      camera.processInput(window.window(), ticker.dt());
+      camera.pointAt(glm::vec3(0.0f, 0.0f, 0.0f));
+
+      window.clear();
+
       shader.use();
-      shader.setUniform1f("time", (float)glfwGetTime());
+      shader.setUniform1f("time", ticker.time());
 
-      cube.setTransform(
-        glm::translate(glm::mat4(1.0f),
-                       glm::vec3(0.0f, 0.0f, sin(glfwGetTime()))));
-      camera.setPosition(glm::vec3(3.0f * sin(0.2f * glfwGetTime()),
-                                   0.0f,
-                                   3.0f * cos(0.2f * glfwGetTime())));
+      // cube.setTransform(
+      //   glm::translate(glm::mat4(1.0f),
+      //                  glm::vec3(0.0f, 0.0f, sin(ticker.time()))));
 
       shader.render({ &cube }, camera);
-      // finish rendering stuff <<<
 
-      m_window->unuse();
+      window.unuse();
     }
   }
 
