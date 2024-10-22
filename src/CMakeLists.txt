@@ -4,7 +4,7 @@ else()
   set(EXECUTABLE ${PROJECT_NAME}.xc)
 endif()
 
-file(GLOB_RECURSE SOURCES "*.cpp")
+file(GLOB_RECURSE SOURCES "*.cpp" "*.h")
 
 add_executable(${EXECUTABLE} ${SOURCES})
 
