@@ -28,7 +28,6 @@ namespace api {
       }
     }
 
-    void unuse();
     void clear();
 
     // accessors

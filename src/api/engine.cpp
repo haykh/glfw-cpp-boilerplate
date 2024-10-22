@@ -88,7 +88,7 @@ namespace engine {
 
       window.processInput();
       camera.processInput(window.window(), ticker.dt());
-      camera.pointAt(glm::vec3(0.0f, 0.0f, 0.0f));
+      // camera.pointAt(glm::vec3(0.0f, 0.0f, 0.0f));
 
       window.clear();
 
@@ -101,7 +101,8 @@ namespace engine {
 
       shader.render({ &cube }, camera);
 
-      window.unuse();
+      glfwSwapBuffers(window.window());
+      glfwPollEvents();
     }
   }
 

@@ -50,9 +50,4 @@ namespace api {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
-  void Window::unuse() {
-    glfwSwapBuffers(m_win);
-    glfwPollEvents();
-  }
-
 } // namespace api
