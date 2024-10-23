@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include <string>
+// #include <utility>
 #include <vector>
 
 namespace api {
@@ -73,6 +74,9 @@ namespace api {
     }
 
     // methods
+    auto recalculate() const -> std::vector<float>;
+
+    void regenBuffers() const;
     void render() const;
   };
 

@@ -12,10 +12,11 @@ target_include_directories(${EXECUTABLE} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(${EXECUTABLE} ${OPENGL_LIBRARIES} glfw ${GLFW_LIBRARIES})
 
-add_custom_command(
-  TARGET ${EXECUTABLE}
+# Copy shaders to the build directory
+add_custom_target(
+  target_shaders
   COMMENT "Copying shaders"
-  POST_BUILD
   COMMAND
-    ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/shaders
-    $<TARGET_FILE_DIR:${EXECUTABLE}>/shaders)
+    ${CMAKE_COMMAND} -E copy_directory_if_different
+    ${CMAKE_CURRENT_SOURCE_DIR}/shaders ${CMAKE_CURRENT_BINARY_DIR}/shaders)
+add_dependencies(${EXECUTABLE} target_shaders)

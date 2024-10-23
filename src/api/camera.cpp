@@ -41,6 +41,12 @@ namespace api {
       setPosition(
         position() + glm::normalize(glm::cross(front(), up())) * norm_speed);
     }
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+      setPosition(position() + 0.5f * norm_speed * up());
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+      setPosition(position() - 0.5f * norm_speed * up());
+    }
   }
 
   void Camera::pointAt(const glm::vec3& target) {

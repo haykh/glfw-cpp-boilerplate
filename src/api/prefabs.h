@@ -31,16 +31,16 @@ namespace prefabs {
       {
         0, 1, 2, // left wall
         2, 3, 0,
-        0, 1, 5, // front wall
-        5, 4, 0,
+        0, 5, 1, // front wall
+        0, 4, 5,
         0, 3, 7, // bottom wall
-        7, 4, 0,
-        1, 2, 6, // top wall
-        6, 5, 1,
-        2, 6, 7, // back wall
-        7, 3, 2,
-        4, 5, 6, // right wall
-        6, 7, 4,
+        0, 7, 4,
+        1, 6, 2, // top wall
+        1, 5, 6,
+        2, 6, 3, // back wall
+        6, 7, 3,
+        4, 6, 5, // right wall
+        4, 7, 6,
       }
     } {}
 

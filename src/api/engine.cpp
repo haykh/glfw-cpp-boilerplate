@@ -33,7 +33,8 @@ namespace engine {
                          resizable };
     api::Camera camera;
     camera.setAspect(window.aspect());
-    camera.setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+    camera.setPosition(glm::vec3(2.0f, 3.0f, 3.0f));
+    camera.pointAt(glm::vec3(0.0f, 0.0f, 0.0f));
 
     auto framebuffer_size_callback = [](GLFWwindow*, int width, int height) {
       glViewport(0, 0, width, height);
@@ -54,8 +55,12 @@ namespace engine {
     const auto exe_path = path::exeDir();
     api::Light light { (exe_path / "shaders" / "light.vert").generic_string(),
                        (exe_path / "shaders" / "light.frag").generic_string() };
+    light.setAmbientStrength(0.2f);
+    light.setDiffuseStrength(1.0f);
+    light.setPosition(glm::vec3(-2.0f, -4.0f, -3.0f));
 
     auto cube = api::Mesh("cube", prefabs::Cube());
+    cube.setColor({ 0.1f, 0.2f, 0.8f });
 
     light.bind(cube.vbo());
 
@@ -70,9 +75,6 @@ namespace engine {
 
       window.clear();
       light.render({ &cube }, camera, ticker.time());
-      // shader.use();
-      // shader.setUniform1f("time", ticker.time());
-      // shader.render({ &cube }, camera);
 
       glfwSwapBuffers(window.window());
       glfwPollEvents();

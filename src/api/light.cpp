@@ -12,13 +12,15 @@ namespace api {
 
   Light::Light(const std::string& vert,
                const std::string& frag,
-               float              I,
+               float              A,
+               float              D,
                const glm::vec3&   col,
                const glm::vec3&   pos)
-    : shader { "light" }
-    , m_intensity { I }
+    : m_ambient_strength { A }
+    , m_diffuse_strength { D }
     , m_color { col }
-    , m_position { pos } {
+    , m_position { pos }
+    , shader { "light" } {
     shader.readShadersFromPaths(vert, frag);
     shader.compile();
     shader.link();
@@ -38,8 +40,10 @@ namespace api {
                      float                           time) const {
     shader.use();
     shader.setUniform1f("time", time);
-    shader.setUniform1f("ambientStrength", m_intensity);
+    shader.setUniform1f("ambientStrength", m_ambient_strength);
+    shader.setUniform1f("diffuseStrength", m_diffuse_strength);
     shader.setUniform3f("lightColor", m_color);
+    shader.setUniform3f("lightPos", m_position);
     shader.setUniformMatrix4fv("view", camera.view());
     shader.setUniformMatrix4fv("projection", camera.project());
     for (const auto& mesh : meshes) {

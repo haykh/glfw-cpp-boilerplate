@@ -15,7 +15,8 @@ namespace api {
   class Light {
     unsigned int m_vao;
 
-    float     m_intensity = 1.0f;
+    float     m_ambient_strength;
+    float     m_diffuse_strength;
     glm::vec3 m_color;
     glm::vec3 m_position;
 
@@ -25,6 +26,7 @@ namespace api {
     Light(const std::string&,
           const std::string&,
           float            = 1.0f,
+          float            = 1.0f,
           const glm::vec3& = glm::vec3(1.0f),
           const glm::vec3& = glm::vec3(0.0f));
 
@@ -32,8 +34,12 @@ namespace api {
     void render(const std::vector<const Mesh*>&, const Camera&, float) const;
 
     // setters
-    void setIntensity(float intensity) {
-      m_intensity = intensity;
+    void setAmbientStrength(float A) {
+      m_ambient_strength = A;
+    }
+
+    void setDiffuseStrength(float D) {
+      m_diffuse_strength = D;
     }
 
     void setColor(const glm::vec3& col) {
@@ -46,8 +52,13 @@ namespace api {
 
     // accessors
     [[nodiscard]]
-    auto intensity() const -> float {
-      return m_intensity;
+    auto ambientStrength() const -> float {
+      return m_ambient_strength;
+    }
+
+    [[nodiscard]]
+    auto diffuseStrength() const -> float {
+      return m_diffuse_strength;
     }
 
     [[nodiscard]]
