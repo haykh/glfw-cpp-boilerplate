@@ -7,7 +7,25 @@
 
 namespace api {
 
-  void Camera::processInput(GLFWwindow* window, float dt) {
+  void Camera::mouseInputCallback(GLFWwindow* win, double xPos, double yPos) {
+    static bool  firstMouse = true;
+    static float lastX      = 0.0f;
+    static float lastY      = 0.0f;
+    auto         cam = static_cast<Camera*>(glfwGetWindowUserPointer(win));
+    if (firstMouse) {
+      firstMouse = false;
+      lastX      = xPos;
+      lastY      = yPos;
+    }
+    float xOffset = (xPos - lastX) * cam->sensitivityX();
+    float yOffset = (lastY - yPos) * cam->sensitivityY();
+    cam->setYaw(cam->yaw() + xOffset);
+    cam->setPitch(cam->pitch() + yOffset);
+    lastX = xPos;
+    lastY = yPos;
+  }
+
+  void Camera::processKeyboardInput(GLFWwindow* window, float dt) {
     const auto norm_speed = speed() * dt;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
       setPosition(position() + norm_speed * front());

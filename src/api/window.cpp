@@ -29,6 +29,8 @@ namespace api {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
+    glfwWindowHint(GLFW_SAMPLES, 4);
+
     m_win = glfwCreateWindow(m_winWidth,
                              m_winHeight,
                              name.c_str(),
@@ -48,6 +50,12 @@ namespace api {
   void Window::clear() {
     glClearColor(m_col_bg[0], m_col_bg[1], m_col_bg[2], m_col_bg[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  }
+
+  void Window::processKeyboardInput() {
+    if (glfwGetKey(m_win, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+      glfwSetWindowShouldClose(m_win, true);
+    }
   }
 
 } // namespace api

@@ -31,11 +31,13 @@ namespace api {
   public:
     static constexpr glm::vec3 WorldUp { 0.0f, 1.0f, 0.0f };
     static constexpr float     Speed { 5.0f };
-    static constexpr float     Sensitivity { 0.1f };
+    static constexpr float     Sensitivity { 0.2f };
 
     Camera() = default;
 
-    void processInput(GLFWwindow*, float);
+    static void mouseInputCallback(GLFWwindow*, double, double);
+
+    void processKeyboardInput(GLFWwindow*, float);
 
     void recalcOrientation();
 
@@ -173,6 +175,16 @@ namespace api {
       return glm::vec3(cos(glm::radians(yaw())) * cos(glm::radians(pitch())),
                        sin(glm::radians(pitch())),
                        sin(glm::radians(yaw())) * cos(glm::radians(pitch())));
+    }
+
+    [[nodiscard]]
+    auto sensitivityX() const -> float {
+      return Sensitivity / aspect();
+    }
+
+    [[nodiscard]]
+    auto sensitivityY() const -> float {
+      return Sensitivity;
     }
 
     // methods

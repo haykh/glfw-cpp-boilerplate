@@ -2,32 +2,30 @@
 #define API_MESH_H
 
 #include "api/prefabs.h"
-#include "utils/error.h"
 
 #include <glm/glm.hpp>
 
-#include <map>
 #include <string>
 #include <vector>
 
 namespace api {
-  namespace raise = utils;
 
   class Mesh {
-    const std::string                   m_name;
-    std::vector<float>                  m_vertices;
-    std::vector<unsigned int>           m_indices;
-    std::map<std::string, unsigned int> m_buffers;
+    const std::string         m_name;
+    std::vector<float>        m_vertices;
+    std::vector<unsigned int> m_indices;
+    unsigned int              m_vao;
+    unsigned int              m_vbo;
+    unsigned int              m_ebo;
+
+    glm::vec3 m_color { 0.33f };
 
     glm::mat4 m_transform { 1.0f };
 
   public:
-    Mesh(const std::string&               name,
-         const std::vector<float>&        vertices,
-         const std::vector<unsigned int>& indices)
-      : m_name { name }
-      , m_vertices { vertices }
-      , m_indices { indices } {}
+    Mesh(const std::string&,
+         const std::vector<float>&,
+         const std::vector<unsigned int>&);
 
     Mesh(const std::string& name, const prefabs::Prefab& obj)
       : Mesh { name, obj.vertices, obj.indices } {}
@@ -39,15 +37,11 @@ namespace api {
       m_transform = transform;
     }
 
-    // accessors
-    [[nodiscard]]
-    auto buffer(const std::string& name) const -> unsigned int {
-      if (m_buffers.find(name) == m_buffers.end()) {
-        raise::error("buffer not found: " + std::string(name));
-      }
-      return m_buffers.at(name);
+    void setColor(const glm::vec3& color) {
+      m_color = color;
     }
 
+    // accessors
     [[nodiscard]]
     auto name() const -> const std::string& {
       return m_name;
@@ -58,9 +52,27 @@ namespace api {
       return m_transform;
     }
 
+    [[nodiscard]]
+    auto color() const -> glm::vec3 {
+      return m_color;
+    }
+
+    [[nodiscard]]
+    auto vao() const -> unsigned int {
+      return m_vao;
+    }
+
+    [[nodiscard]]
+    auto vbo() const -> unsigned int {
+      return m_vbo;
+    }
+
+    [[nodiscard]]
+    auto ebo() const -> unsigned int {
+      return m_ebo;
+    }
+
     // methods
-    void genBuffers();
-    void bind() const;
     void render() const;
   };
 

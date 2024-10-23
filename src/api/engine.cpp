@@ -1,6 +1,7 @@
 #include "engine.h"
 
 #include "api/camera.h"
+#include "api/light.h"
 #include "api/mesh.h"
 #include "api/prefabs.h"
 #include "api/shader.h"
@@ -38,29 +39,11 @@ namespace engine {
       glViewport(0, 0, width, height);
     };
 
-    static bool         firstMouse = true;
-    static float        lastX      = 0.0f;
-    static float        lastY      = 0.0f;
-    static api::Camera* cam        = &camera;
-
-    auto mouse_callback = [](GLFWwindow*, double xPos, double yPos) {
-      if (firstMouse) {
-        firstMouse = false;
-        lastX      = xPos;
-        lastY      = yPos;
-      }
-      float xOffset = (xPos - lastX) * cam->Sensitivity;
-      float yOffset = (lastY - yPos) * cam->Sensitivity;
-      cam->setYaw(cam->yaw() + xOffset);
-      cam->setPitch(cam->pitch() + yOffset);
-      lastX = xPos;
-      lastY = yPos;
-    };
-
+    glfwSetWindowUserPointer(window.window(), &camera);
     glfwMakeContextCurrent(window.window());
 
     glfwSetFramebufferSizeCallback(window.window(), framebuffer_size_callback);
-    glfwSetCursorPosCallback(window.window(), mouse_callback);
+    glfwSetCursorPosCallback(window.window(), api::Camera::mouseInputCallback);
     glfwSetInputMode(window.window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     gladLoadGL(glfwGetProcAddress);
@@ -68,17 +51,13 @@ namespace engine {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
 
-    api::ShaderProgram shader("rectangle");
-    const auto         exe_path = path::exeDir();
-    shader.readShadersFromPaths(
-      (exe_path / "shaders" / "test.vert").generic_string(),
-      (exe_path / "shaders" / "test.frag").generic_string());
-    shader.compile();
-    shader.link();
+    const auto exe_path = path::exeDir();
+    api::Light light { (exe_path / "shaders" / "light.vert").generic_string(),
+                       (exe_path / "shaders" / "light.frag").generic_string() };
 
     auto cube = api::Mesh("cube", prefabs::Cube());
-    cube.genBuffers();
-    cube.bind();
+
+    light.bind(cube.vbo());
 
     log::log(log::INFO, "starting render loop");
 
@@ -86,20 +65,14 @@ namespace engine {
     while (!window.windowShouldClose()) {
       ticker.tick();
 
-      window.processInput();
-      camera.processInput(window.window(), ticker.dt());
-      // camera.pointAt(glm::vec3(0.0f, 0.0f, 0.0f));
+      window.processKeyboardInput();
+      camera.processKeyboardInput(window.window(), ticker.dt());
 
       window.clear();
-
-      shader.use();
-      shader.setUniform1f("time", ticker.time());
-
-      // cube.setTransform(
-      //   glm::translate(glm::mat4(1.0f),
-      //                  glm::vec3(0.0f, 0.0f, sin(ticker.time()))));
-
-      shader.render({ &cube }, camera);
+      light.render({ &cube }, camera, ticker.time());
+      // shader.use();
+      // shader.setUniform1f("time", ticker.time());
+      // shader.render({ &cube }, camera);
 
       glfwSwapBuffers(window.window());
       glfwPollEvents();

@@ -22,12 +22,7 @@ namespace api {
            bool               isResizable = true);
     ~Window();
 
-    void processInput() {
-      if (glfwGetKey(m_win, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(m_win, true);
-      }
-    }
-
+    void processKeyboardInput();
     void clear();
 
     // accessors
