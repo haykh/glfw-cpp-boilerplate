@@ -6,22 +6,25 @@
 #include <glm/glm.hpp>
 
 #include <string>
-// #include <utility>
 #include <vector>
 
-namespace api {
+namespace api::mesh {
+  using color_t     = glm::vec3;
+  using transform_t = glm::mat4;
 
   class Mesh {
     const std::string         m_name;
     std::vector<float>        m_vertices;
     std::vector<unsigned int> m_indices;
-    unsigned int              m_vao;
     unsigned int              m_vbo;
-    unsigned int              m_ebo;
 
-    glm::vec3 m_color { 0.33f };
+    bool m_buffers_generated { false };
 
-    glm::mat4 m_transform { 1.0f };
+    color_t m_color { 0.33f };
+
+    transform_t m_transform { 1.0f };
+
+    auto recalculate() const -> std::vector<float>;
 
   public:
     Mesh(const std::string&,
@@ -31,14 +34,25 @@ namespace api {
     Mesh(const std::string& name, const prefabs::Prefab& obj)
       : Mesh { name, obj.vertices, obj.indices } {}
 
+    Mesh(Mesh&& other) noexcept
+      : m_name { std::move(other.m_name) }
+      , m_vertices { std::move(other.m_vertices) }
+      , m_indices { std::move(other.m_indices) }
+      , m_vbo { other.m_vbo }
+      , m_buffers_generated { other.m_buffers_generated }
+      , m_color { other.m_color }
+      , m_transform { other.m_transform } {}
+
+    Mesh(const Mesh&) = delete;
+
     ~Mesh();
 
     // setters
-    void setTransform(const glm::mat4& transform) {
+    void setTransform(const transform_t& transform) {
       m_transform = transform;
     }
 
-    void setColor(const glm::vec3& color) {
+    void setColor(const color_t& color) {
       m_color = color;
     }
 
@@ -49,18 +63,13 @@ namespace api {
     }
 
     [[nodiscard]]
-    auto transform() const -> glm::mat4 {
+    auto transform() const -> transform_t {
       return m_transform;
     }
 
     [[nodiscard]]
-    auto color() const -> glm::vec3 {
+    auto color() const -> color_t {
       return m_color;
-    }
-
-    [[nodiscard]]
-    auto vao() const -> unsigned int {
-      return m_vao;
     }
 
     [[nodiscard]]
@@ -68,18 +77,13 @@ namespace api {
       return m_vbo;
     }
 
-    [[nodiscard]]
-    auto ebo() const -> unsigned int {
-      return m_ebo;
-    }
-
     // methods
-    auto recalculate() const -> std::vector<float>;
-
-    void regenBuffers() const;
+    void regenBuffers();
     void render() const;
+
+    void print() const;
   };
 
-} // namespace api
+} // namespace api::mesh
 
 #endif // API_MESH_H

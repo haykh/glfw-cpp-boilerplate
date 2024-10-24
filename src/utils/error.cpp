@@ -5,10 +5,10 @@
 #include <stdexcept>
 #include <string>
 
-namespace utils {
+namespace utils::raise {
 
   void error(const char* msg, const char* file, int line, const char* func) {
-    log(utils::ERROR, msg, file, line, func);
+    utils::log::log(utils::log::ERROR, msg, file, line, func);
     throw std::runtime_error(msg);
   }
 
@@ -19,4 +19,4 @@ namespace utils {
     error(msg.c_str(), file, line, func);
   }
 
-} // namespace utils
+} // namespace utils::raise

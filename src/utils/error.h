@@ -5,7 +5,7 @@
 #define FILENAME(file)                                                         \
   (std::string(file).substr(std::string(file).find_last_of("/\\") + 1).c_str())
 
-namespace utils {
+namespace utils::raise {
 
   void error(const char*,
              const char* = FILENAME(__builtin_FILE()),
@@ -17,7 +17,7 @@ namespace utils {
              int         = __builtin_LINE(),
              const char* = __builtin_FUNCTION());
 
-} // namespace utils
+} // namespace utils::raise
 
 #undef FILENAME
 #endif // UTILS_ERROR_H

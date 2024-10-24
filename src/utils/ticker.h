@@ -5,7 +5,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace utils {
+namespace utils::timer {
 
   class Ticker {
     float m_lastTime { 0.0f };
@@ -30,6 +30,6 @@ namespace utils {
     }
   };
 
-} // namespace utils
+} // namespace utils::timer
 
 #endif // UTILS_TICKER_H

@@ -6,15 +6,15 @@
 
 #include <glm/glm.hpp>
 
-namespace api {
+namespace api::camera {
 
   enum class CameraType {
-    PERSPECTIVE,
-    ORTHOGRAPHIC
+    Perspective,
+    Orthographic
   };
 
   class Camera {
-    CameraType m_type { CameraType::PERSPECTIVE };
+    CameraType m_type { CameraType::Perspective };
 
     glm::vec3 m_position { 0.0f, 0.0f, 0.0f };
 
@@ -39,7 +39,7 @@ namespace api {
 
     void processKeyboardInput(GLFWwindow*, float);
 
-    void recalcOrientation();
+    void print() const;
 
     // setters
     void setType(const CameraType& type) {
@@ -80,8 +80,8 @@ namespace api {
 
     // toggles
     void toggleType() {
-      setType((m_type == CameraType::PERSPECTIVE) ? CameraType::ORTHOGRAPHIC
-                                                  : CameraType::PERSPECTIVE);
+      setType((m_type == CameraType::Perspective) ? CameraType::Orthographic
+                                                  : CameraType::Perspective);
     }
 
     // accessors
@@ -172,9 +172,11 @@ namespace api {
 
     [[nodiscard]]
     auto front() const -> glm::vec3 {
-      return glm::vec3(cos(glm::radians(yaw())) * cos(glm::radians(pitch())),
-                       sin(glm::radians(pitch())),
-                       sin(glm::radians(yaw())) * cos(glm::radians(pitch())));
+      const auto frontvec = glm::vec3(
+        cos(glm::radians(yaw())) * cos(glm::radians(pitch())),
+        sin(glm::radians(pitch())),
+        sin(glm::radians(yaw())) * cos(glm::radians(pitch())));
+      return glm::normalize(frontvec);
     }
 
     [[nodiscard]]
@@ -197,6 +199,6 @@ namespace api {
     auto project() const -> glm::mat4;
   };
 
-} // namespace api
+} // namespace api::camera
 
 #endif // API_CAMERA_H

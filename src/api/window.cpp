@@ -7,9 +7,8 @@
 
 #include <GLFW/glfw3.h>
 
-namespace api {
-  namespace log   = utils;
-  namespace raise = utils;
+namespace api::window {
+  using namespace utils;
 
   Window::Window(int                width,
                  int                height,
@@ -58,4 +57,4 @@ namespace api {
     }
   }
 
-} // namespace api
+} // namespace api::window

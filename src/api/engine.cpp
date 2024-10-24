@@ -1,10 +1,9 @@
 #include "engine.h"
 
-#include "api/camera.h"
 #include "api/light.h"
 #include "api/mesh.h"
 #include "api/prefabs.h"
-#include "api/shader.h"
+#include "api/scene.h"
 #include "api/window.h"
 #include "utils/log.h"
 #include "utils/paths.h"
@@ -15,66 +14,87 @@
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 namespace engine {
-  namespace log  = utils;
-  namespace path = utils;
+  using namespace utils;
+  using namespace api;
+  using pos_t = glm::vec3;
+  using col_t = glm::vec3;
 
   void RenderLoop(float scale,
                   int   win_width,
                   int   win_height,
                   float col_bg[4],
                   bool  resizable) {
-    api::Window window { (int)(win_width * scale / 2.0f),
-                         (int)(win_height * scale / 2.0f),
-                         "engine_window",
-                         col_bg,
-                         resizable };
-    api::Camera camera;
-    camera.setAspect(window.aspect());
-    camera.setPosition(glm::vec3(2.0f, 3.0f, 3.0f));
-    camera.pointAt(glm::vec3(0.0f, 0.0f, 0.0f));
-
+    window::Window window { (int)(win_width * scale / 2.0f),
+                            (int)(win_height * scale / 2.0f),
+                            "engine_window",
+                            col_bg,
+                            resizable };
+    glfwMakeContextCurrent(window.window());
+    gladLoadGL(glfwGetProcAddress);
     auto framebuffer_size_callback = [](GLFWwindow*, int width, int height) {
       glViewport(0, 0, width, height);
     };
-
-    glfwSetWindowUserPointer(window.window(), &camera);
-    glfwMakeContextCurrent(window.window());
-
     glfwSetFramebufferSizeCallback(window.window(), framebuffer_size_callback);
-    glfwSetCursorPosCallback(window.window(), api::Camera::mouseInputCallback);
     glfwSetInputMode(window.window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    gladLoadGL(glfwGetProcAddress);
-
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
 
-    const auto exe_path = path::exeDir();
-    api::Light light { (exe_path / "shaders" / "light.vert").generic_string(),
-                       (exe_path / "shaders" / "light.frag").generic_string() };
-    light.setAmbientStrength(0.2f);
-    light.setDiffuseStrength(1.0f);
-    light.setPosition(glm::vec3(-2.0f, -4.0f, -3.0f));
+    // scene setup
+    scene::Scene scene;
+    // shader setup
+    const auto   exe_path = path::exeDir();
+    scene.addShader("example", exe_path / "shaders");
+    scene.addLightShader(exe_path / "shaders");
 
-    auto cube = api::Mesh("cube", prefabs::Cube());
-    cube.setColor({ 0.1f, 0.2f, 0.8f });
+    // camera setup
+    scene.camera.setAspect(window.aspect());
+    scene.camera.setFOV(90.0f);
+    scene.camera.setPosition({ 1.5f, 1.5f, 2.0f });
+    scene.camera.pointAt({ 0.0f, 0.0f, 0.0f });
+    glfwSetWindowUserPointer(window.window(), &scene.camera);
+    glfwSetCursorPosCallback(window.window(),
+                             camera::Camera::mouseInputCallback);
 
-    light.bind(cube.vbo());
+    auto cube = mesh::Mesh("cube", prefabs::Cube());
+    cube.setColor({ 1.0f, 1.0f, 1.0f });
+    cube.regenBuffers();
+
+    scene.addMesh(&cube);
+    scene.addLightMesh(&cube);
+
+    auto point_light = light::Point();
+    point_light.setPosition(glm::vec3(1.5f, 1.5f, 2.0f) * 2.0f);
+    point_light.setAmbientStrength(0.0f);
+    point_light.setDiffuseStrength(0.3f);
+    point_light.setSpecularStrength(0.7f);
+    point_light.setSpecularColor({ 1.0f, 0.3f, 0.8f });
+    point_light.setAttenuation(1.0f, 0.09f, 0.032f);
+
+    auto distant_light = light::Distant();
+    distant_light.setDirection({ -0.2f, -1.0f, -0.3f });
+    distant_light.setAmbientStrength(0.0f);
+    distant_light.setDiffuseStrength(0.0f);
+    distant_light.setSpecularStrength(0.7f);
+
+    scene.addLight(&point_light);
+    scene.addLight(&distant_light);
+
+    scene.print();
 
     log::log(log::INFO, "starting render loop");
 
-    utils::Ticker ticker;
+    timer::Ticker ticker;
     while (!window.windowShouldClose()) {
       ticker.tick();
 
       window.processKeyboardInput();
-      camera.processKeyboardInput(window.window(), ticker.dt());
+      scene.camera.processKeyboardInput(window.window(), ticker.dt());
 
       window.clear();
-      light.render({ &cube }, camera, ticker.time());
+      scene.render(0, ticker.time());
+      scene.renderLights();
 
       glfwSwapBuffers(window.window());
       glfwPollEvents();

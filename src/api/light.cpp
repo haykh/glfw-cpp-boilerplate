@@ -1,56 +1,67 @@
 #include "light.h"
 
-#include "api/mesh.h"
+#include "api/shader.h"
+#include "utils/error.h"
 
-#include <glad/gl.h>
+#include <cstdio>
 
-#include <glm/glm.hpp>
+namespace api::light {
+  using namespace utils;
+  using namespace api::shader;
 
-#include <string>
-
-namespace api {
-
-  Light::Light(const std::string& vert,
-               const std::string& frag,
-               float              A,
-               float              D,
-               const glm::vec3&   col,
-               const glm::vec3&   pos)
-    : m_ambient_strength { A }
-    , m_diffuse_strength { D }
-    , m_color { col }
-    , m_position { pos }
-    , shader { "light" } {
-    shader.readShadersFromPaths(vert, frag);
-    shader.compile();
-    shader.link();
-    glGenVertexArrays(1, &m_vao);
-  }
-
-  void Light::bind(unsigned int vbo) const {
-    glBindVertexArray(m_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(0);
-  }
-
-  void Light::render(const std::vector<const Mesh*>& meshes,
-                     const Camera&                   camera,
-                     float                           time) const {
-    shader.use();
-    shader.setUniform1f("time", time);
-    shader.setUniform1f("ambientStrength", m_ambient_strength);
-    shader.setUniform1f("diffuseStrength", m_diffuse_strength);
-    shader.setUniform3f("lightColor", m_color);
-    shader.setUniform3f("lightPos", m_position);
-    shader.setUniformMatrix4fv("view", camera.view());
-    shader.setUniformMatrix4fv("projection", camera.project());
-    for (const auto& mesh : meshes) {
-      shader.setUniformMatrix4fv("model", mesh->transform());
-      shader.setUniform3f("objectColor", mesh->color());
-      mesh->render();
+  auto to_string(LightType type) -> std::string {
+    switch (type) {
+      case LightType::Distant:
+        return "distant";
+      case LightType::Point:
+        return "point";
+      case LightType::Spotlight:
+        return "spotlight";
+      default:
+        raise::error("invalid light type");
+        return "";
     }
   }
 
-} // namespace api
+  void LightSource::print() const {
+    if (m_id == 0) {
+      printf("%s ", label().c_str());
+    } else {
+      printf("%s[%d] ", label().c_str(), m_id);
+    }
+  }
+
+  void LightSource::illuminate(const ShaderProgram& shader) const {
+    shader.setUniform3fv(uniformLabel("ambientColor"), ambientColor());
+    shader.setUniform3fv(uniformLabel("diffuseColor"), diffuseColor());
+    shader.setUniform3fv(uniformLabel("specularColor"), specularColor());
+    shader.setUniform1f(uniformLabel("ambientStrength"), ambientStrength());
+    shader.setUniform1f(uniformLabel("diffuseStrength"), diffuseStrength());
+    shader.setUniform1f(uniformLabel("specularStrength"), specularStrength());
+  }
+
+  void Positional::illuminate(const ShaderProgram& shader) const {
+    LightSource::illuminate(shader);
+    shader.setUniform3fv(uniformLabel("position"), position());
+  }
+
+  void Directional::illuminate(const ShaderProgram& shader) const {
+    LightSource::illuminate(shader);
+    shader.setUniform3fv(uniformLabel("direction"), direction());
+  }
+
+  void Point::illuminate(const ShaderProgram& shader) const {
+    Positional::illuminate(shader);
+    shader.setUniform1f(uniformLabel("constant"), constant());
+    shader.setUniform1f(uniformLabel("linear"), linear());
+    shader.setUniform1f(uniformLabel("quadratic"), quadratic());
+  }
+
+  void Spotlight::illuminate(const ShaderProgram& shader) const {
+    Directional::illuminate(shader);
+    Positional::illuminate(shader);
+    shader.setUniform1f(uniformLabel("cutoff"), cutoff());
+    shader.setUniform1f(uniformLabel("outerCutoff"), outerCutoff());
+  }
+
+} // namespace api::light

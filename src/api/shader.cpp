@@ -12,9 +12,8 @@
 #include <sstream>
 #include <string>
 
-namespace api {
-  namespace log   = utils;
-  namespace raise = utils;
+namespace api::shader {
+  using namespace utils;
 
   template <GLenum S>
   Shader<S>::Shader(const std::string& label)
@@ -155,23 +154,31 @@ namespace api {
   }
 
   void ShaderProgram::setUniform1f(const std::string& name, float value) const {
+    log::log(log::DEBUG,
+             "setting uniform " + name + " to " + std::to_string(value));
     glUniform1f(glGetUniformLocation(id(), name.c_str()), value);
   }
 
   void ShaderProgram::setUniform1i(const std::string& name, int value) const {
+    log::log(log::DEBUG,
+             "setting uniform " + name + " to " + std::to_string(value));
     glUniform1i(glGetUniformLocation(id(), name.c_str()), value);
   }
 
   void ShaderProgram::setUniform1b(const std::string& name, bool value) const {
+    log::log(log::DEBUG,
+             "setting uniform " + name + " to " + std::to_string(value));
     glUniform1i(glGetUniformLocation(id(), name.c_str()), value);
   }
 
-  void ShaderProgram::setUniform3f(const std::string& name,
-                                   const glm::vec3&   value) const {
-    glUniform3f(glGetUniformLocation(id(), name.c_str()),
-                value.x,
-                value.y,
-                value.z);
+  void ShaderProgram::setUniform3fv(const std::string& name,
+                                    const glm::vec3&   value) const {
+    log::log(log::DEBUG,
+             "setting uniform " + name + " to " + std::to_string(value.x) +
+               " " + std::to_string(value.y) + " " + std::to_string(value.z));
+    glUniform3fv(glGetUniformLocation(id(), name.c_str()),
+                 1,
+                 glm::value_ptr(value));
   }
 
   void ShaderProgram::setUniformMatrix4fv(const std::string& name,
@@ -182,7 +189,11 @@ namespace api {
                        glm::value_ptr(value));
   }
 
+  void ShaderProgram::print() const {
+    printf("%s %u : %s\n", m_label.c_str(), m_id, m_linked ? "✓" : "✗");
+  }
+
   template class Shader<GL_VERTEX_SHADER>;
   template class Shader<GL_FRAGMENT_SHADER>;
 
-} // namespace api
+} // namespace api::shader

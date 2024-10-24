@@ -9,7 +9,7 @@
   #include <unistd.h>
 #endif
 
-namespace utils {
+namespace utils::path {
 
   auto exe() -> std::filesystem::path {
 #if defined(_MSC_VER)
@@ -37,4 +37,4 @@ namespace utils {
 #endif
   }
 
-} // namespace utils
+} // namespace utils::path

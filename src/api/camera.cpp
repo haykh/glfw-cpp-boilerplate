@@ -5,7 +5,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace api {
+#include <cstdio>
+
+namespace api::camera {
 
   void Camera::mouseInputCallback(GLFWwindow* win, double xPos, double yPos) {
     static bool  firstMouse = true;
@@ -62,13 +64,28 @@ namespace api {
   }
 
   auto Camera::project() const -> glm::mat4 {
-    if (m_type == CameraType::ORTHOGRAPHIC) {
+    if (m_type == CameraType::Orthographic) {
       return glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, zNear(), zFar());
     } else {
       return glm::perspective(glm::radians(fov()), aspect(), zNear(), zFar());
     }
   }
 
+  void Camera::print() const {
+    printf("%s : pos [%.2f %.2f %.2f] : fwd [%.2f %.2f %.2f] : fov %.2f : "
+           "[%.2f - %.2f]",
+           type() == CameraType::Perspective ? "Persp" : "Orth",
+           position().x,
+           position().y,
+           position().z,
+           front().x,
+           front().y,
+           front().z,
+           fov(),
+           zNear(),
+           zFar());
+  }
+
   // const glm::vec3& target
 
-} // namespace api
+} // namespace api::camera

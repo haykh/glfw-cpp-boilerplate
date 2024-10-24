@@ -1,50 +1,37 @@
 #include "mesh.h"
 
+#include "utils/error.h"
+
 #include <glad/gl.h>
 
-// #include <utility>
+#include <cstdio>
 
-namespace api {
+namespace api::mesh {
+  using namespace utils;
 
   Mesh::Mesh(const std::string&               name,
              const std::vector<float>&        vertices,
              const std::vector<unsigned int>& indices)
     : m_name { name }
     , m_vertices { vertices }
-    , m_indices { indices } {
-    glGenVertexArrays(1, &m_vao);
-    glGenBuffers(1, &m_vbo);
-    regenBuffers();
-  }
+    , m_indices { indices } {}
 
   Mesh::~Mesh() {
-    glDeleteVertexArrays(1, &m_vao);
     glDeleteBuffers(1, &m_vbo);
   }
 
-  void Mesh::regenBuffers() const {
+  void Mesh::regenBuffers() {
     const auto vertices = recalculate();
+    glGenBuffers(1, &m_vbo);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glBufferData(GL_ARRAY_BUFFER,
                  vertices.size() * sizeof(float),
                  vertices.data(),
                  GL_STATIC_DRAW);
-
-    glBindVertexArray(m_vao);
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // normal attribute
-    glVertexAttribPointer(1,
-                          3,
-                          GL_FLOAT,
-                          GL_FALSE,
-                          6 * sizeof(float),
-                          (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+
+    m_buffers_generated = true;
   }
 
   auto Mesh::recalculate() const -> std::vector<float> {
@@ -54,7 +41,7 @@ namespace api {
       const auto vidx2 = m_indices[tidx + 1] * 3;
       const auto vidx3 = m_indices[tidx + 2] * 3;
 
-      const auto normal = -glm::vec3(
+      const auto normal = glm::vec3(
         -m_vertices[vidx2 + 2] * m_vertices[vidx3 + 1] +
           m_vertices[vidx1 + 2] *
             (-m_vertices[vidx2 + 1] + m_vertices[vidx3 + 1]) +
@@ -89,8 +76,18 @@ namespace api {
   }
 
   void Mesh::render() const {
-    glBindVertexArray(m_vao);
+    if (!m_buffers_generated) {
+      raise::error("buffers not generated for mesh: " + m_name);
+    }
     glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_indices.size()));
   }
 
-} // namespace api
+  void Mesh::print() const {
+    printf("%s : nvert [%ld] : nind [%ld] -- %s",
+           m_name.c_str(),
+           m_vertices.size(),
+           m_indices.size(),
+           m_buffers_generated ? "✓" : "✗");
+  }
+
+} // namespace api::mesh

@@ -3,11 +3,11 @@
 
 #include <filesystem>
 
-namespace utils {
+namespace utils::path {
 
   auto exe() -> std::filesystem::path;
   auto exeDir() -> std::filesystem::path;
 
-} // namespace utils
+} // namespace utils::path
 
 #endif // UTILS_PATHS_H

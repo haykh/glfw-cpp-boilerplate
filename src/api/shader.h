@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace api {
+namespace api::shader {
 
   template <GLenum S>
   class Shader {
@@ -70,12 +70,13 @@ namespace api {
     void compile();
     void link();
     void use() const;
+    void print() const;
 
     // uniforms
     void setUniform1f(const std::string&, float) const;
     void setUniform1i(const std::string&, int) const;
     void setUniform1b(const std::string&, bool) const;
-    void setUniform3f(const std::string&, const glm::vec3&) const;
+    void setUniform3fv(const std::string&, const glm::vec3&) const;
     void setUniformMatrix4fv(const std::string&, const glm::mat4&) const;
 
     // accessors
@@ -95,6 +96,6 @@ namespace api {
     }
   };
 
-} // namespace api
+} // namespace api::shader
 
 #endif // API_SHADER_H

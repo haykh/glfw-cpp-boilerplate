@@ -7,9 +7,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-namespace raise = utils;
-
 auto main(int, char**) -> int {
+  using namespace utils;
   if (glfwInit()) {
     try {
       engine::RenderLoop();

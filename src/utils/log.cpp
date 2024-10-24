@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace utils {
+namespace utils::log {
 
   auto logLevel2Color(LogLevel level) -> const char* {
     switch (level) {
@@ -52,6 +52,11 @@ namespace utils {
            const char* file,
            int         line,
            const char* func) {
+    if (level == DEBUG) {
+#ifdef NDEBUG
+      return;
+#endif
+    }
     fprintf(level != ERROR ? stdout : stderr,
             "%s%-10s%-8s [%s@%d in %s]\n:> %s%s\n",
             logLevel2Color(level),
@@ -72,4 +77,4 @@ namespace utils {
     log(level, msg.c_str(), file, line, func);
   }
 
-} // namespace utils
+} // namespace utils::log

@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace api {
+namespace api::window {
 
   class Window {
   private:
@@ -42,6 +42,6 @@ namespace api {
     }
   };
 
-} // namespace api
+} // namespace api::window
 
 #endif // API_WINDOW_H
