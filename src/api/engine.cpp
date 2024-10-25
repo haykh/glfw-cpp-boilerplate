@@ -67,10 +67,9 @@ namespace engine {
     auto point_light = light::Point();
     point_light.setPosition(glm::vec3(1.5f, 1.5f, 2.0f) * 2.0f);
     point_light.setAmbientStrength(0.0f);
-    point_light.setDiffuseStrength(0.3f);
+    point_light.setDiffuseStrength(0.1f);
     point_light.setSpecularStrength(0.7f);
     point_light.setSpecularColor({ 1.0f, 0.3f, 0.8f });
-    point_light.setAttenuation(1.0f, 0.09f, 0.032f);
 
     auto distant_light = light::Distant();
     distant_light.setDirection({ -0.2f, -1.0f, -0.3f });
@@ -78,8 +77,15 @@ namespace engine {
     distant_light.setDiffuseStrength(0.0f);
     distant_light.setSpecularStrength(0.7f);
 
+    auto spot_light = light::Spotlight();
+    spot_light.setAmbientStrength(0.0f);
+    spot_light.setDiffuseStrength(0.5f);
+    spot_light.setSpecularStrength(0.5f);
+    spot_light.setDiffuseColor({ 0.2f, 0.2f, 1.0f });
+
     scene.addLight(&point_light);
     scene.addLight(&distant_light);
+    scene.addLight(&spot_light);
 
     scene.print();
 
@@ -88,6 +94,11 @@ namespace engine {
     timer::Ticker ticker;
     while (!window.windowShouldClose()) {
       ticker.tick();
+      const auto new_pos = glm::vec3(1.0f * glm::cos(ticker.time()),
+                                     2.0f,
+                                     1.0f * glm::sin(ticker.time()));
+      spot_light.setPosition(new_pos);
+      spot_light.setDirection(glm::vec3(0.0f) - new_pos);
 
       window.processKeyboardInput();
       scene.camera.processKeyboardInput(window.window(), ticker.dt());

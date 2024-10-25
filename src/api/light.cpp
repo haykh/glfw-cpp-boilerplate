@@ -3,7 +3,9 @@
 #include "api/shader.h"
 #include "utils/error.h"
 
+#include <algorithm>
 #include <cstdio>
+#include <string>
 
 namespace api::light {
   using namespace utils;
@@ -40,9 +42,35 @@ namespace api::light {
     shader.setUniform1f(uniformLabel("specularStrength"), specularStrength());
   }
 
+  [[nodiscard]]
+  auto LightSource::shaderDeclaration() const -> std::string {
+    auto type = to_string(m_type);
+    std::transform(type.begin(), type.begin() + 1, type.begin(), ::toupper);
+    return "uniform " + type + "Light " + label() + ";";
+  }
+
+  [[nodiscard]]
+  auto LightSource::shaderCall() const -> std::string {
+    if (m_type == LightType::Point) {
+      return "result += CalcPointLight(" + label() +
+             ", norm, FragPos, viewDir);";
+    } else if (m_type == LightType::Distant) {
+      return "result += CalcDistantLight(" + label() + ", norm, viewDir);";
+    } else if (m_type == LightType::Spotlight) {
+      return "result += CalcSpotLight(" + label() +
+             ", norm, FragPos, viewDir);";
+    } else {
+      raise::error("light type not recognized");
+      return "";
+    }
+  }
+
   void Positional::illuminate(const ShaderProgram& shader) const {
     LightSource::illuminate(shader);
     shader.setUniform3fv(uniformLabel("position"), position());
+    shader.setUniform1f(uniformLabel("constant"), constant());
+    shader.setUniform1f(uniformLabel("linear"), linear());
+    shader.setUniform1f(uniformLabel("quadratic"), quadratic());
   }
 
   void Directional::illuminate(const ShaderProgram& shader) const {
@@ -50,18 +78,13 @@ namespace api::light {
     shader.setUniform3fv(uniformLabel("direction"), direction());
   }
 
-  void Point::illuminate(const ShaderProgram& shader) const {
-    Positional::illuminate(shader);
-    shader.setUniform1f(uniformLabel("constant"), constant());
-    shader.setUniform1f(uniformLabel("linear"), linear());
-    shader.setUniform1f(uniformLabel("quadratic"), quadratic());
-  }
-
   void Spotlight::illuminate(const ShaderProgram& shader) const {
     Directional::illuminate(shader);
     Positional::illuminate(shader);
-    shader.setUniform1f(uniformLabel("cutoff"), cutoff());
-    shader.setUniform1f(uniformLabel("outerCutoff"), outerCutoff());
+    shader.setUniform1f(uniformLabel("cutOff"),
+                        glm::cos(glm::radians(cutoff())));
+    shader.setUniform1f(uniformLabel("outerCutOff"),
+                        glm::cos(glm::radians(outerCutoff())));
   }
 
 } // namespace api::light

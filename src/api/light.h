@@ -95,16 +95,12 @@ namespace api::light {
 
     [[nodiscard]]
     auto label() const -> std::string {
-      return to_string(m_type) + "Light";
+      return to_string(m_type) + "Light" + std::to_string(id());
     }
 
     [[nodiscard]]
     auto uniformLabel(const std::string& uniform) const -> std::string {
-      // if (m_id == 0) {
       return label() + "." + uniform;
-      // } else {
-      //   return label() + "s[" + std::to_string(m_id) + "]." + uniform;
-      // }
     }
 
     [[nodiscard]]
@@ -136,11 +132,20 @@ namespace api::light {
     auto specularStrength() const -> float {
       return m_specular_strength;
     }
+
+    [[nodiscard]]
+    auto shaderDeclaration() const -> std::string;
+
+    [[nodiscard]]
+    auto shaderCall() const -> std::string;
   };
 
   class Positional : virtual public LightSource {
   protected:
     pos_t m_position { 0.0f };
+    float m_constant { 1.0f };
+    float m_linear { 0.09f };
+    float m_quadratic { 0.032f };
 
   public:
     Positional(LightType type) : LightSource { type } {}
@@ -151,9 +156,42 @@ namespace api::light {
       m_position = pos;
     }
 
+    void setConstant(float constant) {
+      m_constant = constant;
+    }
+
+    void setLinear(float linear) {
+      m_linear = linear;
+    }
+
+    void setQuadratic(float quadratic) {
+      m_quadratic = quadratic;
+    }
+
+    void setAttenuation(float constant, float linear, float quadratic) {
+      m_constant  = constant;
+      m_linear    = linear;
+      m_quadratic = quadratic;
+    }
+
     [[nodiscard]]
     auto position() const -> pos_t {
       return m_position;
+    }
+
+    [[nodiscard]]
+    auto constant() const -> float {
+      return m_constant;
+    }
+
+    [[nodiscard]]
+    auto linear() const -> float {
+      return m_linear;
+    }
+
+    [[nodiscard]]
+    auto quadratic() const -> float {
+      return m_quadratic;
     }
   };
 
@@ -183,55 +221,16 @@ namespace api::light {
   };
 
   class Point : public Positional {
-    float m_constant { 1.0f };
-    float m_linear { 0.0f };
-    float m_quadratic { 0.0f };
-
   public:
     Point()
       : LightSource { LightType::Point }
       , Positional { LightType::Point } {}
-
-    void illuminate(const ShaderProgram&) const override;
-
-    void setConstant(float constant) {
-      m_constant = constant;
-    }
-
-    void setLinear(float linear) {
-      m_linear = linear;
-    }
-
-    void setQuadratic(float quadratic) {
-      m_quadratic = quadratic;
-    }
-
-    void setAttenuation(float constant, float linear, float quadratic) {
-      m_constant  = constant;
-      m_linear    = linear;
-      m_quadratic = quadratic;
-    }
-
-    [[nodiscard]]
-    auto constant() const -> float {
-      return m_constant;
-    }
-
-    [[nodiscard]]
-    auto linear() const -> float {
-      return m_linear;
-    }
-
-    [[nodiscard]]
-    auto quadratic() const -> float {
-      return m_quadratic;
-    }
   };
 
   class Spotlight : public Directional,
                     public Positional {
-    float m_cutoff { glm::cos(glm::radians(12.5f)) };
-    float m_outer_cutoff { glm::cos(glm::radians(15.0f)) };
+    float m_cutoff { 12.5f };
+    float m_outer_cutoff { 15.0f };
 
   public:
     Spotlight()

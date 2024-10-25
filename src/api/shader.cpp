@@ -36,6 +36,11 @@ namespace api::shader {
   }
 
   template <GLenum S>
+  void Shader<S>::setOriginalShaderSource(const std::string& source) {
+    m_original_source = source;
+  }
+
+  template <GLenum S>
   void Shader<S>::readShaderFromPath(const std::string& path) {
     if (is_source_set()) {
       raise::error("shader source already set");
@@ -64,11 +69,12 @@ namespace api::shader {
       raise::error("failed to read shader file : " + std::string(e.what()));
     }
     setShaderSource(shader_src);
+    setOriginalShaderSource(shader_src);
   }
 
   template <GLenum S>
-  void Shader<S>::compile() {
-    if (is_compiled()) {
+  void Shader<S>::compile(bool errorIfCompiled) {
+    if (is_compiled() && errorIfCompiled) {
       raise::error("shader already compiled");
     } else if (!is_source_set()) {
       raise::error("shader source not set");
@@ -83,6 +89,7 @@ namespace api::shader {
     if (!success) {
       char infoLog[512];
       glGetShaderInfoLog(id(), 512, nullptr, infoLog);
+      log::log(log::INFO, "shader source : \n" + source());
       raise::error(
         label() + " shader compilation failed : " + std::string(infoLog));
     } else {
@@ -115,13 +122,13 @@ namespace api::shader {
     m_fragmentShader.setShaderSource(fragment);
   }
 
-  void ShaderProgram::compile() {
-    m_vertexShader.compile();
-    m_fragmentShader.compile();
+  void ShaderProgram::compile(bool errorIfCompiled) {
+    m_vertexShader.compile(errorIfCompiled);
+    m_fragmentShader.compile(errorIfCompiled);
   }
 
-  void ShaderProgram::link() {
-    if (is_linked()) {
+  void ShaderProgram::link(bool errorIfLinked) {
+    if (is_linked() && errorIfLinked) {
       raise::error("shader program already linked");
     } else if (!m_vertexShader.is_compiled() ||
                !m_fragmentShader.is_compiled()) {

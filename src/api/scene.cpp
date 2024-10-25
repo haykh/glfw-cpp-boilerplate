@@ -80,6 +80,34 @@ namespace api::scene {
     if (p_light->type() != LightType::Distant) {
       m_positional_lights.push_back(dynamic_cast<Positional*>(p_light));
     }
+    std::string shader_declarations = "";
+    std::string shader_calls        = "";
+    for (const auto& light : m_lights) {
+      shader_declarations += light->shaderDeclaration() + "\n";
+      shader_calls        += light->shaderCall() + "\n";
+    }
+    for (auto& shader : m_shaders) {
+      auto frag_src = shader.fragmentShader().original_source();
+      auto pos      = frag_src.find("/* subst: light sources */");
+      if (pos != std::string::npos) {
+        frag_src.replace(pos, 26, shader_declarations);
+      } else {
+        log::log(
+          log::WARNING,
+          "could not find /* subst: light sources */ in fragment shader");
+      }
+      pos = frag_src.find("/* subst: light calculations */");
+      if (pos != std::string::npos) {
+        frag_src.replace(pos, 31, shader_calls);
+      } else {
+        log::log(
+          log::WARNING,
+          "could not find /* subst: light calculations */ in fragment shader");
+      }
+      shader.fragmentShader().setShaderSource(frag_src);
+      shader.recompile();
+      shader.relink();
+    }
   }
 
   void Scene::addShader(const std::string&           shader_name,

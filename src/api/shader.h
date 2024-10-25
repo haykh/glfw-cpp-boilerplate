@@ -14,6 +14,7 @@ namespace api::shader {
     const std::string  m_label;
     const unsigned int m_id;
     std::string        m_source;
+    std::string        m_original_source;
     bool               m_source_set { false };
     bool               m_compiled { false };
 
@@ -22,9 +23,14 @@ namespace api::shader {
     ~Shader();
 
     void readShaderFromPath(const std::string&);
+    void setOriginalShaderSource(const std::string&);
     void setShaderSource(const std::string&);
 
-    void compile();
+    void compile(bool = true);
+
+    void recompile() {
+      compile(false);
+    }
 
     // accessors
     [[nodiscard]]
@@ -40,6 +46,11 @@ namespace api::shader {
     [[nodiscard]]
     auto source() const -> const std::string& {
       return m_source;
+    }
+
+    [[nodiscard]]
+    auto original_source() const -> const std::string& {
+      return m_original_source;
     }
 
     [[nodiscard]]
@@ -67,8 +78,18 @@ namespace api::shader {
     void readShadersFromPaths(const std::string&, const std::string&);
     void setShaderSources(const std::string&, const std::string&);
 
-    void compile();
-    void link();
+    void compile(bool = true);
+
+    void recompile() {
+      compile(false);
+    }
+
+    void link(bool = true);
+
+    void relink() {
+      link(false);
+    }
+
     void use() const;
     void print() const;
 
@@ -93,6 +114,16 @@ namespace api::shader {
     [[nodiscard]]
     auto is_linked() const -> bool {
       return m_linked;
+    }
+
+    [[nodiscard]]
+    auto vertexShader() -> Shader<GL_VERTEX_SHADER>& {
+      return m_vertexShader;
+    }
+
+    [[nodiscard]]
+    auto fragmentShader() -> Shader<GL_FRAGMENT_SHADER>& {
+      return m_fragmentShader;
     }
   };
 
