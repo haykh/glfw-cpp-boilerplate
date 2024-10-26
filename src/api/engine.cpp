@@ -1,5 +1,7 @@
 #include "engine.h"
 
+#include "global.h"
+
 #include "api/light.h"
 #include "api/mesh.h"
 #include "api/prefabs.h"
@@ -18,14 +20,12 @@
 namespace engine {
   using namespace utils;
   using namespace api;
-  using pos_t = glm::vec3;
-  using col_t = glm::vec3;
 
-  void RenderLoop(float scale,
-                  int   win_width,
-                  int   win_height,
-                  float col_bg[4],
-                  bool  resizable) {
+  void RenderLoop(float   scale,
+                  int     win_width,
+                  int     win_height,
+                  color_t col_bg,
+                  bool    resizable) {
     window::Window window { (int)(win_width * scale / 2.0f),
                             (int)(win_height * scale / 2.0f),
                             "engine_window",
@@ -65,7 +65,7 @@ namespace engine {
     scene.addLightMesh(&cube);
 
     auto point_light = light::Point();
-    point_light.setPosition(glm::vec3(1.5f, 1.5f, 2.0f) * 2.0f);
+    point_light.setPosition(pos_t(1.5f, 1.5f, 2.0f) * 2.0f);
     point_light.setAmbientStrength(0.0f);
     point_light.setDiffuseStrength(0.1f);
     point_light.setSpecularStrength(0.7f);
@@ -94,11 +94,11 @@ namespace engine {
     timer::Ticker ticker;
     while (!window.windowShouldClose()) {
       ticker.tick();
-      const auto new_pos = glm::vec3(1.0f * glm::cos(ticker.time()),
-                                     2.0f,
-                                     1.0f * glm::sin(ticker.time()));
+      const auto new_pos = pos_t(1.0f * glm::cos(ticker.time()),
+                                 2.0f,
+                                 1.0f * glm::sin(ticker.time()));
       spot_light.setPosition(new_pos);
-      spot_light.setDirection(glm::vec3(0.0f) - new_pos);
+      spot_light.setDirection(pos_t(0.0f) - new_pos);
 
       window.processKeyboardInput();
       scene.camera.processKeyboardInput(window.window(), ticker.dt());

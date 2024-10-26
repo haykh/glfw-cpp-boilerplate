@@ -1,5 +1,7 @@
 #include "window.h"
 
+#include "global.h"
+
 #include "utils/error.h"
 #include "utils/log.h"
 
@@ -13,11 +15,11 @@ namespace api::window {
   Window::Window(int                width,
                  int                height,
                  const std::string& name,
-                 float              col_bg[4],
+                 const color_t&     col_bg,
                  bool               isResizable)
     : m_winWidth(width)
     , m_winHeight(height)
-    , m_col_bg { col_bg[0], col_bg[1], col_bg[2], col_bg[3] } {
+    , m_col_bg { col_bg } {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -47,7 +49,7 @@ namespace api::window {
   }
 
   void Window::clear() {
-    glClearColor(m_col_bg[0], m_col_bg[1], m_col_bg[2], m_col_bg[3]);
+    glClearColor(m_col_bg.r, m_col_bg.g, m_col_bg.b, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 

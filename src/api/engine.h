@@ -1,13 +1,15 @@
 #ifndef API_ENGINE_H
 #define API_ENGINE_H
 
+#include "global.h"
+
 namespace engine {
 
-  void RenderLoop(float scale      = 1.0f,
-                  int   win_width  = 2560,
-                  int   win_height = 1440,
-                  float col_bg[4]  = new float[] { 0.0f, 0.0f, 0.0f, 1.0f },
-                  bool  resizable  = true);
+  void RenderLoop(float   = 1.0f,
+                  int     = 2560,
+                  int     = 1440,
+                  color_t = { 0.0f, 0.0f, 0.0f },
+                  bool    = true);
 
 } // namespace engine
 

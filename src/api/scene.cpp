@@ -164,9 +164,9 @@ namespace api::scene {
       if (light == nullptr) {
         log::log(log::WARNING, "light source is null");
       } else {
-        auto model = glm::mat4(1.0f);
+        auto model = transform_t(1.0f);
         model      = glm::translate(model, light->position());
-        model      = glm::scale(model, glm::vec3(0.1f));
+        model      = glm::scale(model, vec_t(0.1f));
         m_light_shader.setUniformMatrix4fv("model", model);
         if (light->diffuseStrength() > light->specularStrength()) {
           m_light_shader.setUniform3fv("modelColor", light->diffuseColor());

@@ -41,7 +41,7 @@ namespace api::mesh {
       const auto vidx2 = m_indices[tidx + 1] * 3;
       const auto vidx3 = m_indices[tidx + 2] * 3;
 
-      const auto normal = glm::vec3(
+      const auto normal = vec_t(
         -m_vertices[vidx2 + 2] * m_vertices[vidx3 + 1] +
           m_vertices[vidx1 + 2] *
             (-m_vertices[vidx2 + 1] + m_vertices[vidx3 + 1]) +

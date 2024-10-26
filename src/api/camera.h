@@ -1,10 +1,10 @@
 #ifndef API_CAMERA_H
 #define API_CAMERA_H
 
+#include "global.h"
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
 
 namespace api::camera {
 
@@ -16,7 +16,7 @@ namespace api::camera {
   class Camera {
     CameraType m_type { CameraType::Perspective };
 
-    glm::vec3 m_position { 0.0f, 0.0f, 0.0f };
+    pos_t m_position { 0.0f, 0.0f, 0.0f };
 
     float m_fov { 45.0f };
     float m_aspect { 1.0f };
@@ -29,9 +29,9 @@ namespace api::camera {
     float m_roll { 0.0f };
 
   public:
-    static constexpr glm::vec3 WorldUp { 0.0f, 1.0f, 0.0f };
-    static constexpr float     Speed { 5.0f };
-    static constexpr float     Sensitivity { 0.2f };
+    static constexpr vec_t WorldUp { 0.0f, 1.0f, 0.0f };
+    static constexpr float Speed { 5.0f };
+    static constexpr float Sensitivity { 0.2f };
 
     Camera() = default;
 
@@ -46,7 +46,7 @@ namespace api::camera {
       m_type = type;
     }
 
-    void setPosition(const glm::vec3& position) {
+    void setPosition(const pos_t& position) {
       m_position = position;
     }
 
@@ -91,7 +91,7 @@ namespace api::camera {
     }
 
     [[nodiscard]]
-    auto position() const -> const glm::vec3& {
+    auto position() const -> const pos_t& {
       return m_position;
     }
 
@@ -136,43 +136,43 @@ namespace api::camera {
     }
 
     [[nodiscard]]
-    auto right(const glm::vec3& front) const -> glm::vec3 {
+    auto right(const glm::vec3& front) const -> vec_t {
       return glm::normalize(glm::cross(front, WorldUp));
     }
 
     [[nodiscard]]
-    auto right() const -> glm::vec3 {
+    auto right() const -> vec_t {
       return right(front());
     }
 
     [[nodiscard]]
-    auto left(const glm::vec3& front) const -> glm::vec3 {
+    auto left(const glm::vec3& front) const -> vec_t {
       return -right(front);
     }
 
     [[nodiscard]]
-    auto left() const -> glm::vec3 {
+    auto left() const -> vec_t {
       return left(front());
     }
 
     [[nodiscard]]
-    auto up(const glm::vec3& front, const glm::vec3& right) const -> glm::vec3 {
+    auto up(const vec_t& front, const vec_t& right) const -> vec_t {
       return glm::normalize(glm::cross(right, front));
     }
 
     [[nodiscard]]
-    auto up(const glm::vec3& front) const -> glm::vec3 {
+    auto up(const vec_t& front) const -> vec_t {
       return glm::normalize(glm::cross(right(front), front));
     }
 
     [[nodiscard]]
-    auto up() const -> glm::vec3 {
+    auto up() const -> vec_t {
       return glm::normalize(glm::cross(right(), front()));
     }
 
     [[nodiscard]]
-    auto front() const -> glm::vec3 {
-      const auto frontvec = glm::vec3(
+    auto front() const -> vec_t {
+      const auto frontvec = vec_t(
         cos(glm::radians(yaw())) * cos(glm::radians(pitch())),
         sin(glm::radians(pitch())),
         sin(glm::radians(yaw())) * cos(glm::radians(pitch())));
@@ -190,13 +190,13 @@ namespace api::camera {
     }
 
     // methods
-    void pointAt(const glm::vec3&);
+    void pointAt(const pos_t&);
 
     [[nodiscard]]
-    auto view() const -> glm::mat4;
+    auto view() const -> transform_t;
 
     [[nodiscard]]
-    auto project() const -> glm::mat4;
+    auto project() const -> transform_t;
   };
 
 } // namespace api::camera

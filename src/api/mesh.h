@@ -1,6 +1,8 @@
 #ifndef API_MESH_H
 #define API_MESH_H
 
+#include "global.h"
+
 #include "api/prefabs.h"
 
 #include <glm/glm.hpp>
@@ -9,8 +11,6 @@
 #include <vector>
 
 namespace api::mesh {
-  using color_t     = glm::vec3;
-  using transform_t = glm::mat4;
 
   class Mesh {
     const std::string         m_name;

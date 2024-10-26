@@ -89,18 +89,20 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '^".*.h'
+  - Regex: '^"global.h'
     Priority: 1
-  - Regex: '^\<GL\/.*\.h\>'
+  - Regex: '^".*.h'
     Priority: 2
-  - Regex: '^\<glad\/.*\.h\>'
+  - Regex: '^\<GL\/.*\.h\>'
     Priority: 3
-  - Regex: '^\<glfw\/.*\.h\>'
+  - Regex: '^\<glad\/.*\.h\>'
     Priority: 4
-  - Regex: '^\<glm.*\.h'
+  - Regex: '^\<glfw\/.*\.h\>'
     Priority: 5
-  - Regex: "<[[:lower:].|_]+>"
+  - Regex: '^\<glm.*\.h'
     Priority: 6
+  - Regex: "<[[:lower:].|_]+>"
+    Priority: 7
 IncludeIsMainRegex: "(Test)?$"
 IncludeIsMainSourceRegex: ""
 IndentAccessModifiers: false

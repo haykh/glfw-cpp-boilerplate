@@ -1,6 +1,8 @@
 #ifndef API_WINDOW_H
 #define API_WINDOW_H
 
+#include "global.h"
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -12,14 +14,10 @@ namespace api::window {
   private:
     GLFWwindow* m_win;
     int         m_winWidth, m_winHeight;
-    float       m_col_bg[4];
+    color_t     m_col_bg;
 
   public:
-    Window(int                width,
-           int                height,
-           const std::string& name,
-           float              col_bg[4],
-           bool               isResizable = true);
+    Window(int, int, const std::string&, const color_t&, bool = true);
     ~Window();
 
     void processKeyboardInput();

@@ -1,18 +1,14 @@
 #ifndef API_LIGHT_H
 #define API_LIGHT_H
 
-#include "api/shader.h"
+#include "global.h"
 
-#include <glm/glm.hpp>
+#include "api/shader.h"
 
 #include <string>
 
 namespace api::light {
   using namespace api::shader;
-
-  using color_t = glm::vec3;
-  using pos_t   = glm::vec3;
-  using vec_t   = glm::vec3;
 
   enum class LightType {
     Distant,

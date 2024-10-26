@@ -2,7 +2,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <cstdio>
@@ -51,19 +50,19 @@ namespace api::camera {
     }
   }
 
-  void Camera::pointAt(const glm::vec3& target) {
+  void Camera::pointAt(const pos_t& target) {
     const auto front = glm::normalize(target - m_position);
     m_yaw            = glm::degrees(atan2(front.z, front.x));
     m_pitch          = glm::degrees(asin(front.y));
   }
 
-  auto Camera::view() const -> glm::mat4 {
+  auto Camera::view() const -> transform_t {
     const auto frDir = front();
     const auto upDir = up(frDir);
     return glm::lookAt(m_position, m_position + frDir, upDir);
   }
 
-  auto Camera::project() const -> glm::mat4 {
+  auto Camera::project() const -> transform_t {
     if (m_type == CameraType::Orthographic) {
       return glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, zNear(), zFar());
     } else {
@@ -85,7 +84,5 @@ namespace api::camera {
            zNear(),
            zFar());
   }
-
-  // const glm::vec3& target
 
 } // namespace api::camera
