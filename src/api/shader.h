@@ -14,8 +14,8 @@ namespace api::shader {
     const std::string  m_label;
     const unsigned int m_id;
     std::string        m_source;
-    std::string        m_original_source;
-    bool               m_source_set { false };
+    std::string        m_source_in { "" };
+    std::string        m_source_in_fname;
     bool               m_compiled { false };
 
   public:
@@ -23,13 +23,18 @@ namespace api::shader {
     ~Shader();
 
     void readShaderFromPath(const std::string&);
-    void setOriginalShaderSource(const std::string&);
-    void setShaderSource(const std::string&);
+
+    void saveShaderSource() const;
+    void replaceString(const std::string&, const std::string&);
 
     void compile(bool = true);
 
     void recompile() {
       compile(false);
+    }
+
+    void setCompiled(bool compiled) {
+      m_compiled = compiled;
     }
 
     // accessors
@@ -39,23 +44,18 @@ namespace api::shader {
     }
 
     [[nodiscard]]
-    auto label() const -> const std::string& {
+    auto label() const -> std::string {
       return m_label;
     }
 
     [[nodiscard]]
-    auto source() const -> const std::string& {
+    auto source() const -> std::string {
       return m_source;
     }
 
     [[nodiscard]]
-    auto original_source() const -> const std::string& {
-      return m_original_source;
-    }
-
-    [[nodiscard]]
-    auto is_source_set() const -> bool {
-      return m_source_set;
+    auto source_in() const -> std::string {
+      return m_source_in;
     }
 
     [[nodiscard]]
@@ -76,7 +76,6 @@ namespace api::shader {
     ~ShaderProgram();
 
     void readShadersFromPaths(const std::string&, const std::string&);
-    void setShaderSources(const std::string&, const std::string&);
 
     void compile(bool = true);
 
@@ -93,9 +92,19 @@ namespace api::shader {
     void use() const;
     void print() const;
 
+    void setLinked(bool linked) {
+      m_linked = linked;
+    }
+
+    void setCompiled(bool compiled) {
+      m_vertexShader.setCompiled(compiled);
+      m_fragmentShader.setCompiled(compiled);
+    }
+
     // uniforms
     void setUniform1f(const std::string&, float) const;
     void setUniform1i(const std::string&, int) const;
+    void setUniform1ui(const std::string&, unsigned int) const;
     void setUniform1b(const std::string&, bool) const;
     void setUniform3fv(const std::string&, const glm::vec3&) const;
     void setUniformMatrix4fv(const std::string&, const glm::mat4&) const;

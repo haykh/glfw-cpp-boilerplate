@@ -22,6 +22,11 @@ namespace api::camera {
     float yOffset = (lastY - yPos) * cam->sensitivityY();
     cam->setYaw(cam->yaw() + xOffset);
     cam->setPitch(cam->pitch() + yOffset);
+    if (cam->pitch() > 89.0f) {
+      cam->setPitch(89.0f);
+    } else if (cam->pitch() < -89.0f) {
+      cam->setPitch(-89.0f);
+    }
     lastX = xPos;
     lastY = yPos;
   }
@@ -29,24 +34,26 @@ namespace api::camera {
   void Camera::processKeyboardInput(GLFWwindow* window, float dt) {
     const auto norm_speed = speed() * dt;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      setPosition(position() + norm_speed * front());
+      setPosition(position() + norm_speed * horizontalFront());
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      setPosition(position() - norm_speed * front());
+      setPosition(position() - norm_speed * horizontalFront());
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
       setPosition(
-        position() - glm::normalize(glm::cross(front(), up())) * norm_speed);
+        position() -
+        glm::normalize(glm::cross(horizontalFront(), up())) * norm_speed);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
       setPosition(
-        position() + glm::normalize(glm::cross(front(), up())) * norm_speed);
+        position() +
+        glm::normalize(glm::cross(horizontalFront(), up())) * norm_speed);
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-      setPosition(position() + 0.5f * norm_speed * up());
+      setPosition(position() + 0.5f * norm_speed * WorldUp);
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-      setPosition(position() - 0.5f * norm_speed * up());
+      setPosition(position() - 0.5f * norm_speed * WorldUp);
     }
   }
 

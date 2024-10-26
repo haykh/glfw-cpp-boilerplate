@@ -46,7 +46,7 @@ namespace engine {
     // shader setup
     const auto   exe_path = path::exeDir();
     scene.addShader("example", exe_path / "shaders");
-    scene.addLightShader(exe_path / "shaders");
+    // scene.addLightShader(exe_path / "shaders");
 
     // camera setup
     scene.camera.setAspect(window.aspect());
@@ -58,11 +58,10 @@ namespace engine {
                              camera::Camera::mouseInputCallback);
 
     auto cube = mesh::Mesh("cube", prefabs::Cube());
-    cube.setColor({ 1.0f, 1.0f, 1.0f });
     cube.regenBuffers();
-
-    scene.addMesh(&cube);
-    scene.addLightMesh(&cube);
+    material::Default cube_mat("cube material");
+    cube_mat.setShininess(1024.0f);
+    cube.setMaterial(&cube_mat);
 
     auto point_light = light::Point();
     point_light.setPosition(pos_t(1.5f, 1.5f, 2.0f) * 2.0f);
@@ -83,10 +82,14 @@ namespace engine {
     spot_light.setSpecularStrength(0.5f);
     spot_light.setDiffuseColor({ 0.2f, 0.2f, 1.0f });
 
+    scene.addMesh(&cube);
+    scene.addLightMesh(&cube);
     scene.addLight(&point_light);
     scene.addLight(&distant_light);
     scene.addLight(&spot_light);
 
+    scene.configureShaders();
+    scene.compileShaders();
     scene.print();
 
     log::log(log::INFO, "starting render loop");
@@ -105,7 +108,6 @@ namespace engine {
 
       window.clear();
       scene.render(0, ticker.time());
-      scene.renderLights();
 
       glfwSwapBuffers(window.window());
       glfwPollEvents();

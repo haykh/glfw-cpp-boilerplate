@@ -26,11 +26,7 @@ namespace api::light {
   }
 
   void LightSource::print() const {
-    if (m_id == 0) {
-      printf("%s ", label().c_str());
-    } else {
-      printf("%s[%d] ", label().c_str(), m_id);
-    }
+    printf("%sLight%u\n", to_string(m_type).c_str(), id());
   }
 
   void LightSource::illuminate(const ShaderProgram& shader) const {
@@ -53,12 +49,13 @@ namespace api::light {
   auto LightSource::shaderCall() const -> std::string {
     if (m_type == LightType::Point) {
       return "result += CalcPointLight(" + label() +
-             ", norm, FragPos, viewDir);";
+             ", norm, FragPos, viewDir, activeMat);";
     } else if (m_type == LightType::Distant) {
-      return "result += CalcDistantLight(" + label() + ", norm, viewDir);";
+      return "result += CalcDistantLight(" + label() +
+             ", norm, viewDir, activeMat);";
     } else if (m_type == LightType::Spotlight) {
       return "result += CalcSpotLight(" + label() +
-             ", norm, FragPos, viewDir);";
+             ", norm, FragPos, viewDir, activeMat);";
     } else {
       raise::error("light type not recognized");
       return "";

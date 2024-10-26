@@ -1,5 +1,6 @@
 #include "mesh.h"
 
+#include "api/shader.h"
 #include "utils/error.h"
 
 #include <glad/gl.h>
@@ -8,16 +9,22 @@
 
 namespace api::mesh {
   using namespace utils;
+  using namespace api::shader;
 
   Mesh::Mesh(const std::string&               name,
              const std::vector<float>&        vertices,
              const std::vector<unsigned int>& indices)
-    : m_name { name }
+    : m_id { MeshId++ }
+    , m_name { name }
     , m_vertices { vertices }
     , m_indices { indices } {}
 
   Mesh::~Mesh() {
     glDeleteBuffers(1, &m_vbo);
+  }
+
+  void Mesh::identifyMesh(const ShaderProgram& shader) const {
+    shader.setUniform1i("mesh_id", id());
   }
 
   void Mesh::regenBuffers() {
@@ -75,16 +82,17 @@ namespace api::mesh {
     return vertices;
   }
 
-  void Mesh::render() const {
+  void Mesh::render(const ShaderProgram& shader) const {
     if (!m_buffers_generated) {
       raise::error("buffers not generated for mesh: " + m_name);
     }
+    shader.setUniform1i("activeMesh.matId", material()->inShaderId());
     glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_indices.size()));
   }
 
   void Mesh::print() const {
     printf("%s : nvert [%ld] : nind [%ld] -- %s",
-           m_name.c_str(),
+           label().c_str(),
            m_vertices.size(),
            m_indices.size(),
            m_buffers_generated ? "✓" : "✗");

@@ -91,7 +91,7 @@ namespace api::light {
 
     [[nodiscard]]
     auto label() const -> std::string {
-      return to_string(m_type) + "Light" + std::to_string(id());
+      return to_string(type()) + "Light" + std::to_string(id());
     }
 
     [[nodiscard]]
@@ -144,6 +144,8 @@ namespace api::light {
     float m_quadratic { 0.032f };
 
   public:
+    pos_t* const position_ptr { &m_position };
+
     Positional(LightType type) : LightSource { type } {}
 
     virtual void illuminate(const ShaderProgram&) const override;

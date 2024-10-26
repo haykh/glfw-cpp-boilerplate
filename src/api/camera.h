@@ -180,6 +180,12 @@ namespace api::camera {
     }
 
     [[nodiscard]]
+    auto horizontalFront() const -> vec_t {
+      const auto frontvec = front();
+      return glm::normalize(vec_t(frontvec.x, 0.0f, frontvec.z));
+    }
+
+    [[nodiscard]]
     auto sensitivityX() const -> float {
       return Sensitivity / aspect();
     }

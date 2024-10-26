@@ -28,33 +28,21 @@ namespace api::shader {
   }
 
   template <GLenum S>
-  void Shader<S>::setShaderSource(const std::string& source) {
-    m_source         = source;
-    m_source_set     = true;
-    const auto src_c = m_source.c_str();
-    glShaderSource(id(), 1, &src_c, nullptr);
-  }
-
-  template <GLenum S>
-  void Shader<S>::setOriginalShaderSource(const std::string& source) {
-    m_original_source = source;
-  }
-
-  template <GLenum S>
   void Shader<S>::readShaderFromPath(const std::string& path) {
-    if (is_source_set()) {
-      raise::error("shader source already set");
+    if (!m_source_in.empty()) {
+      log::log(log::WARNING, "shader source already set; resetting");
     }
     // check filenames
     if constexpr (S == GL_VERTEX_SHADER) {
-      if (path.find(".vert") == std::string::npos) {
+      if (path.find(".vert.in") == std::string::npos) {
         raise::error("vertex shader must have .vert extension");
       }
     } else if constexpr (S == GL_FRAGMENT_SHADER) {
-      if (path.find(".frag") == std::string::npos) {
+      if (path.find(".frag.in") == std::string::npos) {
         raise::error("fragment shader must have .frag extension");
       }
     }
+    m_source_in_fname = path;
     log::log(log::DEBUG, "reading shader file : " + path);
     std::string   shader_src;
     std::ifstream file;
@@ -68,18 +56,51 @@ namespace api::shader {
     } catch (const std::ifstream::failure& e) {
       raise::error("failed to read shader file : " + std::string(e.what()));
     }
-    setShaderSource(shader_src);
-    setOriginalShaderSource(shader_src);
+    m_source_in = shader_src;
+    m_source    = shader_src;
+    m_compiled  = false;
+  }
+
+  template <GLenum S>
+  void Shader<S>::saveShaderSource() const {
+    if (m_source_in_fname.empty()) {
+      raise::error("shader source file name not set");
+    } else if (m_source.empty()) {
+      raise::error("shader source empty");
+    } else if (m_source_in_fname.find(".in") == std::string::npos) {
+      raise::error("shader source file name must have extension .in");
+    }
+    // write m_source to m_source_in_fname without .in at end
+    std::ofstream file;
+    file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+    try {
+      file.open(m_source_in_fname.substr(0, m_source_in_fname.size() - 3));
+      file << m_source;
+      file.close();
+    } catch (const std::ofstream::failure& e) {
+      raise::error("failed to write shader file : " + std::string(e.what()));
+    }
+  }
+
+  template <GLenum S>
+  void Shader<S>::replaceString(const std::string& str,
+                                const std::string& newstr) {
+    size_t pos = m_source.find(str);
+    if (pos == std::string::npos) {
+      raise::error(str + " not found in shader source");
+    }
+    m_source.replace(pos, str.size(), newstr);
   }
 
   template <GLenum S>
   void Shader<S>::compile(bool errorIfCompiled) {
     if (is_compiled() && errorIfCompiled) {
       raise::error("shader already compiled");
-    } else if (!is_source_set()) {
-      raise::error("shader source not set");
+    } else if (m_source.empty()) {
+      raise::error("shader source empty");
     }
-    const auto src_c = source().c_str();
+    saveShaderSource();
+    const auto src_c = m_source.c_str();
     glShaderSource(id(), 1, &src_c, nullptr);
     glCompileShader(id());
 
@@ -114,12 +135,7 @@ namespace api::shader {
                                            const std::string& fragment_path) {
     m_vertexShader.readShaderFromPath(vertex_path);
     m_fragmentShader.readShaderFromPath(fragment_path);
-  }
-
-  void ShaderProgram::setShaderSources(const std::string& vertex,
-                                       const std::string& fragment) {
-    m_vertexShader.setShaderSource(vertex);
-    m_fragmentShader.setShaderSource(fragment);
+    m_linked = false;
   }
 
   void ShaderProgram::compile(bool errorIfCompiled) {
@@ -170,6 +186,13 @@ namespace api::shader {
     log::log(log::DEBUG,
              "setting uniform " + name + " to " + std::to_string(value));
     glUniform1i(glGetUniformLocation(id(), name.c_str()), value);
+  }
+
+  void ShaderProgram::setUniform1ui(const std::string& name,
+                                    unsigned int       value) const {
+    log::log(log::DEBUG,
+             "setting uniform " + name + " to " + std::to_string(value));
+    glUniform1ui(glGetUniformLocation(id(), name.c_str()), value);
   }
 
   void ShaderProgram::setUniform1b(const std::string& name, bool value) const {

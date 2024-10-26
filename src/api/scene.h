@@ -24,7 +24,7 @@ namespace api::scene {
 
     // auxiliary
     unsigned int             m_light_vao;
-    Mesh*                    m_light_mesh;
+    Mesh*                    m_light_mesh { nullptr };
     ShaderProgram            m_light_shader;
     std::vector<Positional*> m_positional_lights;
 
@@ -39,6 +39,9 @@ namespace api::scene {
     void addLight(LightSource*);
     void addShader(const std::string&, const std::filesystem::path&);
     void addLightShader(const std::filesystem::path&);
+
+    void configureShaders();
+    void compileShaders();
 
     void render(unsigned int, float) const;
     void renderLights() const;
