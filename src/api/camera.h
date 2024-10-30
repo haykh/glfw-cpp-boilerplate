@@ -3,17 +3,22 @@
 
 #include "global.h"
 
+#include "api/object.h"
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <any>
+
 namespace api::camera {
+  using namespace api::object;
 
   enum class CameraType {
     Perspective,
     Orthographic
   };
 
-  class Camera {
+  class Camera : public Object {
     CameraType m_type { CameraType::Perspective };
 
     pos_t m_position { 0.0f, 0.0f, 0.0f };
@@ -38,50 +43,13 @@ namespace api::camera {
     static void mouseInputCallback(GLFWwindow*, double, double);
 
     void processKeyboardInput(GLFWwindow*, float);
-
     void print() const;
+    void set(const std::string&, std::any);
 
-    // setters
-    void setType(const CameraType& type) {
-      m_type = type;
-    }
-
-    void setPosition(const pos_t& position) {
-      m_position = position;
-    }
-
-    void setFOV(float fov) {
-      m_fov = fov;
-    }
-
-    void setAspect(float aspect) {
-      m_aspect = aspect;
-    }
-
-    void setZNear(float zNear) {
-      m_zNear = zNear;
-    }
-
-    void setZFar(float zFar) {
-      m_zFar = zFar;
-    }
-
-    void setYaw(float yaw) {
-      m_yaw = yaw;
-    }
-
-    void setPitch(float pitch) {
-      m_pitch = pitch;
-    }
-
-    void setRoll(float roll) {
-      m_roll = roll;
-    }
-
-    // toggles
     void toggleType() {
-      setType((m_type == CameraType::Perspective) ? CameraType::Orthographic
-                                                  : CameraType::Perspective);
+      set("type",
+          (m_type == CameraType::Perspective) ? CameraType::Orthographic
+                                              : CameraType::Perspective);
     }
 
     // accessors

@@ -28,6 +28,15 @@ namespace api::shader {
   }
 
   template <GLenum S>
+  void Shader<S>::set(const std::string& key, std::any value) {
+    if (key == "compiled") {
+      m_compiled = std::any_cast<bool>(value);
+    } else {
+      raise::error("invalid key : " + key);
+    }
+  }
+
+  template <GLenum S>
   void Shader<S>::readShaderFromPath(const std::string& path) {
     if (!m_source_in.empty()) {
       log::log(log::WARNING, "shader source already set; resetting");
@@ -58,7 +67,7 @@ namespace api::shader {
     }
     m_source_in = shader_src;
     m_source    = shader_src;
-    m_compiled  = false;
+    set("compiled", false);
   }
 
   template <GLenum S>
@@ -116,7 +125,7 @@ namespace api::shader {
     } else {
       log::log(log::SUCCESS, label() + " shader compiled successfully");
     }
-    m_compiled = true;
+    set("compiled", true);
   }
 
   ShaderProgram::ShaderProgram(const std::string& label)
@@ -131,11 +140,22 @@ namespace api::shader {
     }
   }
 
+  void ShaderProgram::set(const std::string& key, std::any value) {
+    if (key == "linked") {
+      m_linked = std::any_cast<bool>(value);
+    } else if (key == "compiled") {
+      m_vertexShader.set("compiled", value);
+      m_fragmentShader.set("compiled", value);
+    } else {
+      raise::error("invalid key : " + key);
+    }
+  }
+
   void ShaderProgram::readShadersFromPaths(const std::string& vertex_path,
                                            const std::string& fragment_path) {
     m_vertexShader.readShaderFromPath(vertex_path);
     m_fragmentShader.readShaderFromPath(fragment_path);
-    m_linked = false;
+    set("linked", false);
   }
 
   void ShaderProgram::compile(bool errorIfCompiled) {

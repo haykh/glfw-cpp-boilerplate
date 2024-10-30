@@ -4,6 +4,7 @@
 #include "utils/error.h"
 
 #include <algorithm>
+#include <any>
 #include <cstdio>
 #include <string>
 
@@ -27,6 +28,24 @@ namespace api::light {
 
   void LightSource::print() const {
     printf("%sLight%u\n", to_string(m_type).c_str(), id());
+  }
+
+  void LightSource::set(const std::string& key, std::any value) {
+    if (key == "ambientColor") {
+      m_ambient_color = std::any_cast<color_t>(value);
+    } else if (key == "diffuseColor") {
+      m_diffuse_color = std::any_cast<color_t>(value);
+    } else if (key == "specularColor") {
+      m_specular_color = std::any_cast<color_t>(value);
+    } else if (key == "ambientStrength") {
+      m_ambient_strength = std::any_cast<float>(value);
+    } else if (key == "diffuseStrength") {
+      m_diffuse_strength = std::any_cast<float>(value);
+    } else if (key == "specularStrength") {
+      m_specular_strength = std::any_cast<float>(value);
+    } else {
+      raise::error("invalid key for LightSource " + key);
+    }
   }
 
   void LightSource::illuminate(const ShaderProgram& shader) const {
@@ -62,6 +81,24 @@ namespace api::light {
     }
   }
 
+  void Positional::set(const std::string& key, std::any value) {
+    if (key == "position") {
+      m_position = std::any_cast<pos_t>(value);
+    } else if (key == "constant") {
+      m_constant = std::any_cast<float>(value);
+    } else if (key == "linear") {
+      m_linear = std::any_cast<float>(value);
+    } else if (key == "quadratic") {
+      m_quadratic = std::any_cast<float>(value);
+    } else if (key == "ambientColor" || key == "diffuseColor" ||
+               key == "specularColor" || key == "ambientStrength" ||
+               key == "diffuseStrength" || key == "specularStrength") {
+      LightSource::set(key, value);
+    } else {
+      raise::error("invalid key for Positional " + key);
+    }
+  }
+
   void Positional::illuminate(const ShaderProgram& shader) const {
     LightSource::illuminate(shader);
     shader.setUniform3fv(uniformLabel("position"), position());
@@ -73,6 +110,37 @@ namespace api::light {
   void Directional::illuminate(const ShaderProgram& shader) const {
     LightSource::illuminate(shader);
     shader.setUniform3fv(uniformLabel("direction"), direction());
+  }
+
+  void Directional::set(const std::string& key, std::any value) {
+    if (key == "direction") {
+      m_direction = std::any_cast<vec_t>(value);
+    } else if (key == "ambientColor" || key == "diffuseColor" ||
+               key == "specularColor" || key == "ambientStrength" ||
+               key == "diffuseStrength" || key == "specularStrength") {
+      LightSource::set(key, value);
+    } else {
+      raise::error("invalid key for Directional " + key);
+    }
+  }
+
+  void Spotlight::set(const std::string& key, std::any value) {
+    if (key == "cutoff") {
+      m_cutoff = std::any_cast<float>(value);
+    } else if (key == "outerCutoff") {
+      m_outer_cutoff = std::any_cast<float>(value);
+    } else if (key == "ambientColor" || key == "diffuseColor" ||
+               key == "specularColor" || key == "ambientStrength" ||
+               key == "diffuseStrength" || key == "specularStrength") {
+      LightSource::set(key, value);
+    } else if (key == "position" || key == "constant" || key == "linear" ||
+               key == "quadratic") {
+      Positional::set(key, value);
+    } else if (key == "direction") {
+      Directional::set(key, value);
+    } else {
+      raise::error("invalid key for Spotlight " + key);
+    }
   }
 
   void Spotlight::illuminate(const ShaderProgram& shader) const {

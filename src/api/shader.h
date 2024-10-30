@@ -1,16 +1,20 @@
 #ifndef API_SHADER_H
 #define API_SHADER_H
 
+#include "api/object.h"
+
 #include <glad/gl.h>
 
 #include <glm/glm.hpp>
 
+#include <any>
 #include <string>
 
 namespace api::shader {
+  using namespace api::object;
 
   template <GLenum S>
-  class Shader {
+  class Shader : public Object {
     const std::string  m_label;
     const unsigned int m_id;
     std::string        m_source;
@@ -23,18 +27,13 @@ namespace api::shader {
     ~Shader();
 
     void readShaderFromPath(const std::string&);
-
     void saveShaderSource() const;
     void replaceString(const std::string&, const std::string&);
-
     void compile(bool = true);
+    void set(const std::string&, std::any) override;
 
     void recompile() {
       compile(false);
-    }
-
-    void setCompiled(bool compiled) {
-      m_compiled = compiled;
     }
 
     // accessors
@@ -64,7 +63,7 @@ namespace api::shader {
     }
   };
 
-  class ShaderProgram {
+  class ShaderProgram : public Object {
     const std::string          m_label;
     const unsigned int         m_id;
     bool                       m_linked { false };
@@ -91,15 +90,7 @@ namespace api::shader {
 
     void use() const;
     void print() const;
-
-    void setLinked(bool linked) {
-      m_linked = linked;
-    }
-
-    void setCompiled(bool compiled) {
-      m_vertexShader.setCompiled(compiled);
-      m_fragmentShader.setCompiled(compiled);
-    }
+    void set(const std::string&, std::any) override;
 
     // uniforms
     void setUniform1f(const std::string&, float) const;

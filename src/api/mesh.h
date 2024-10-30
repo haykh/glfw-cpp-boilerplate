@@ -4,6 +4,7 @@
 #include "global.h"
 
 #include "api/material.h"
+#include "api/object.h"
 #include "api/prefabs.h"
 #include "api/shader.h"
 #include "utils/error.h"
@@ -11,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <any>
 #include <string>
 #include <vector>
 
@@ -18,10 +20,11 @@ namespace api::mesh {
   using namespace utils;
   using namespace api::material;
   using namespace api::shader;
+  using namespace api::object;
 
   static unsigned int MeshId { 0 };
 
-  class Mesh {
+  class Mesh : public Object {
     const unsigned int m_id;
     const std::string  m_name;
 
@@ -66,36 +69,13 @@ namespace api::mesh {
 
     ~Mesh();
 
-    void bindPosition(vec_t* const position) {
-      m_bound_position = position;
-    }
+    void bindPosition(vec_t* const);
+    void bindScale(vec_t* const);
+    void bindRotation(transform_t* const);
+    void set(const std::string&, std::any) override;
 
-    void bindScale(vec_t* const scale) {
-      m_bound_scale = scale;
-    }
-
-    void bindRotation(transform_t* const rotation) {
-      m_bound_rotation = rotation;
-    }
-
-    void setPosition(const vec_t& position) {
-      m_position = position;
-    }
-
-    void setScale(const vec_t& scale) {
-      m_scale = scale;
-    }
-
-    void setRotation(const transform_t& rotation) {
-      m_rotation = rotation;
-    }
-
+    void attachMaterial(Material*);
     void identifyMesh(const ShaderProgram&) const;
-
-    // setters
-    void setMaterial(Material* material) {
-      m_material = material;
-    }
 
     // accessors
     [[nodiscard]]
@@ -109,25 +89,7 @@ namespace api::mesh {
     }
 
     [[nodiscard]]
-    auto transform() const -> transform_t {
-      auto transform_mat = transform_t { 1.0f };
-      if (m_bound_position != nullptr) {
-        transform_mat = glm::translate(transform_mat, *m_bound_position);
-      } else {
-        transform_mat = glm::translate(transform_mat, m_position);
-      }
-      if (m_bound_rotation != nullptr) {
-        transform_mat = transform_mat * *m_bound_rotation;
-      } else {
-        transform_mat = transform_mat * m_rotation;
-      }
-      if (m_bound_scale != nullptr) {
-        transform_mat = glm::scale(transform_mat, *m_bound_scale);
-      } else {
-        transform_mat = glm::scale(transform_mat, m_scale);
-      }
-      return transform_mat;
-    }
+    auto transform() const -> transform_t;
 
     [[nodiscard]]
     auto vbo() const -> unsigned int {

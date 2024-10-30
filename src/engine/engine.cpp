@@ -47,48 +47,58 @@ namespace engine {
     const auto   exe_path = path::exeDir();
     scene.addShader("example", exe_path / "shaders");
 
-    // camera setup
-    scene.camera.setAspect(window.aspect());
-    scene.camera.setFOV(90.0f);
-    scene.camera.setPosition({ 1.5f, 1.5f, 2.0f });
-    scene.camera.pointAt({ 0.0f, 0.0f, 0.0f });
+    // camera
+    scene.camera.configure({
+      { "aspect", window.aspect() },
+      { "position", pos_t(1.5f, 1.5f, 2.0f) },
+      { "type", camera::CameraType::Perspective }
+    });
     glfwSetWindowUserPointer(window.window(), &scene.camera);
     glfwSetCursorPosCallback(window.window(),
                              camera::Camera::mouseInputCallback);
 
+    // lights
+    auto point_light   = light::Point({
+      { "position", pos_t(1.5f, 1.5f, 2.0f) * 2.0f },
+      { "ambientStrength", 0.1f },
+      { "diffuseStrength", 0.5f },
+      { "specularStrength", 1.0f },
+      { "specularColor", color_t(1.0f, 0.3f, 0.8f) }
+    });
+    auto distant_light = light::Distant({
+      { "direction", pos_t(-0.2f, -1.0f, -0.3f) },
+      { "ambientStrength", 0.0f },
+      { "diffuseStrength", 0.0f },
+      { "specularStrength", 0.7f }
+    });
+    auto spot_light    = light::Spotlight({
+      { "ambientStrength", 0.0f },
+      { "diffuseStrength", 1.0f },
+      { "specularStrength", 1.0f },
+      { "diffuseColor", color_t(0.5f, 0.5f, 1.0f) }
+    });
+
+    // materials
+
+    // meshes
     auto cube = mesh::Mesh("cube", prefabs::Cube());
     cube.regenBuffers();
-    material::Default cube_mat("cube material");
-    cube_mat.setShininess(32.0f);
-    cube_mat.addDiffuseTexture(exe_path / "assets" / "container2.png");
-    cube_mat.addSpecularTexture(
-      exe_path / "assets" / "container2_specular.png");
-    cube.setMaterial(&cube_mat);
 
-    auto point_light = light::Point();
-    point_light.setPosition(pos_t(1.5f, 1.5f, 2.0f) * 2.0f);
-    point_light.setAmbientStrength(0.1f);
-    point_light.setDiffuseStrength(0.5f);
-    point_light.setSpecularStrength(1.0f);
-    point_light.setSpecularColor({ 1.0f, 0.3f, 0.8f });
-
-    auto distant_light = light::Distant();
-    distant_light.setDirection({ -0.2f, -1.0f, -0.3f });
-    distant_light.setAmbientStrength(0.0f);
-    distant_light.setDiffuseStrength(0.0f);
-    distant_light.setSpecularStrength(0.7f);
-
-    auto spot_light = light::Spotlight();
-    spot_light.setAmbientStrength(0.0f);
-    spot_light.setDiffuseStrength(1.0f);
-    spot_light.setSpecularStrength(0.4f);
-    spot_light.setDiffuseColor({ 0.2f, 0.2f, 1.0f });
-
+    scene.addMaterial(new material::Default(
+      "cube material",
+      {
+        {      "shininess",      128.0f                           },
+        { "diffuseTexture", exe_path / "assets" / "container2.png"},
+        {"specularTexture",
+         exe_path / "assets" / "container2_specular.png"          }
+    }));
     scene.addMesh(&cube);
     scene.addLightMesh(&cube);
     scene.addLight(&point_light);
     scene.addLight(&distant_light);
     scene.addLight(&spot_light);
+
+    cube.attachMaterial(scene.material(0));
 
     scene.configureShaders();
     scene.compileShaders();
@@ -102,8 +112,10 @@ namespace engine {
       const auto new_pos = pos_t(1.0f * glm::cos(ticker.time()),
                                  2.0f,
                                  1.0f * glm::sin(ticker.time()));
-      spot_light.setPosition(new_pos);
-      spot_light.setDirection(pos_t(0.0f) - new_pos);
+      spot_light.configure({
+        { "position",               new_pos},
+        {"direction", pos_t(0.0f) - new_pos}
+      });
 
       window.processKeyboardInput();
       scene.camera.processKeyboardInput(window.window(), ticker.dt());

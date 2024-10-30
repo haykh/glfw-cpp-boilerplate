@@ -3,6 +3,7 @@
 
 #include "api/camera.h"
 #include "api/light.h"
+#include "api/material.h"
 #include "api/mesh.h"
 #include "api/shader.h"
 
@@ -19,6 +20,7 @@ namespace api::scene {
   class Scene {
     unsigned int               m_vao;
     std::vector<Mesh*>         m_meshes;
+    std::vector<Material*>     m_materials;
     std::vector<LightSource*>  m_lights;
     std::vector<ShaderProgram> m_shaders;
 
@@ -36,6 +38,7 @@ namespace api::scene {
 
     void addMesh(Mesh*);
     void addLightMesh(Mesh*);
+    void addMaterial(Material*);
     void addLight(LightSource*);
     void addShader(const std::string&, const std::filesystem::path&);
     void addLightShader(const std::filesystem::path&);
@@ -45,6 +48,9 @@ namespace api::scene {
 
     void render(unsigned int, float) const;
     void renderLights() const;
+
+    [[nodiscard]]
+    auto material(unsigned int m) -> Material*;
 
     void print() const;
   };

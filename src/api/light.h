@@ -3,12 +3,15 @@
 
 #include "global.h"
 
+#include "api/object.h"
 #include "api/shader.h"
 
+#include <any>
 #include <string>
 
 namespace api::light {
   using namespace api::shader;
+  using namespace api::object;
 
   enum class LightType {
     Distant,
@@ -20,7 +23,7 @@ namespace api::light {
 
   static unsigned int LightId { 0 };
 
-  class LightSource {
+  class LightSource : public Object {
   protected:
     const unsigned int m_id;
     const LightType    m_type;
@@ -37,46 +40,8 @@ namespace api::light {
     LightSource(LightType type) : m_id { LightId++ }, m_type { type } {}
 
     virtual void illuminate(const ShaderProgram&) const;
+    virtual void set(const std::string& key, std::any value) override;
     void         print() const;
-
-    // setters
-    void setAmbientColor(const color_t& color) {
-      m_ambient_color = color;
-    }
-
-    void setDiffuseColor(const color_t& color) {
-      m_diffuse_color = color;
-    }
-
-    void setSpecularColor(const color_t& color) {
-      m_specular_color = color;
-    }
-
-    void setColors(const color_t& ambient,
-                   const color_t& diffuse,
-                   const color_t& specular) {
-      m_ambient_color  = ambient;
-      m_diffuse_color  = diffuse;
-      m_specular_color = specular;
-    }
-
-    void setAmbientStrength(float strength) {
-      m_ambient_strength = strength;
-    }
-
-    void setDiffuseStrength(float strength) {
-      m_diffuse_strength = strength;
-    }
-
-    void setSpecularStrength(float strength) {
-      m_specular_strength = strength;
-    }
-
-    void setStrengths(float ambient, float diffuse, float specular) {
-      m_ambient_strength  = ambient;
-      m_diffuse_strength  = diffuse;
-      m_specular_strength = specular;
-    }
 
     // accessors
     [[nodiscard]]
@@ -149,28 +114,7 @@ namespace api::light {
     Positional(LightType type) : LightSource { type } {}
 
     virtual void illuminate(const ShaderProgram&) const override;
-
-    void setPosition(const pos_t& pos) {
-      m_position = pos;
-    }
-
-    void setConstant(float constant) {
-      m_constant = constant;
-    }
-
-    void setLinear(float linear) {
-      m_linear = linear;
-    }
-
-    void setQuadratic(float quadratic) {
-      m_quadratic = quadratic;
-    }
-
-    void setAttenuation(float constant, float linear, float quadratic) {
-      m_constant  = constant;
-      m_linear    = linear;
-      m_quadratic = quadratic;
-    }
+    virtual void set(const std::string&, std::any) override;
 
     [[nodiscard]]
     auto position() const -> pos_t {
@@ -200,10 +144,7 @@ namespace api::light {
     Directional(LightType type) : LightSource { type } {}
 
     virtual void illuminate(const ShaderProgram&) const override;
-
-    void setDirection(const vec_t& dir) {
-      m_direction = dir;
-    }
+    virtual void set(const std::string&, std::any) override;
 
     [[nodiscard]]
     auto direction() const -> vec_t {
@@ -213,16 +154,20 @@ namespace api::light {
 
   class Distant : public Directional {
   public:
-    Distant()
+    Distant(const config_t& params = {})
       : LightSource { LightType::Distant }
-      , Directional { LightType::Distant } {}
+      , Directional { LightType::Distant } {
+      configure(params);
+    }
   };
 
   class Point : public Positional {
   public:
-    Point()
+    Point(const config_t& params = {})
       : LightSource { LightType::Point }
-      , Positional { LightType::Point } {}
+      , Positional { LightType::Point } {
+      configure(params);
+    }
   };
 
   class Spotlight : public Directional,
@@ -231,25 +176,15 @@ namespace api::light {
     float m_outer_cutoff { 15.0f };
 
   public:
-    Spotlight()
+    Spotlight(const config_t& params = {})
       : LightSource { LightType::Spotlight }
       , Directional { LightType::Spotlight }
-      , Positional { LightType::Spotlight } {}
+      , Positional { LightType::Spotlight } {
+      configure(params);
+    }
 
     void illuminate(const ShaderProgram&) const override;
-
-    void setCutoffs(float cutoff, float outer_cutoff) {
-      m_cutoff       = cutoff;
-      m_outer_cutoff = outer_cutoff;
-    }
-
-    void setCutoff(float cutoff) {
-      m_cutoff = cutoff;
-    }
-
-    void setOuterCutoff(float outer_cutoff) {
-      m_outer_cutoff = outer_cutoff;
-    }
+    void set(const std::string&, std::any) override;
 
     [[nodiscard]]
     auto cutoff() const -> float {

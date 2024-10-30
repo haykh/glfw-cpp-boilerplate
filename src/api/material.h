@@ -3,17 +3,16 @@
 
 #include "global.h"
 
+#include "api/object.h"
 #include "api/shader.h"
 #include "api/texture.h"
-#include "utils/error.h"
 
-#include <filesystem>
 #include <string>
 
 namespace api::material {
   using namespace api::shader;
   using namespace api::texture;
-  using namespace utils;
+  using namespace api::object;
 
   enum class MaterialType {
     Default,
@@ -27,7 +26,7 @@ namespace api::material {
 
   auto shaderDeclaration(unsigned int, unsigned int) -> std::string;
 
-  class Material {
+  class Material : public Object {
   protected:
     const unsigned int m_id;
     const MaterialType m_type;
@@ -94,33 +93,9 @@ namespace api::material {
     }
 
     virtual void shade(const ShaderProgram&) const override;
-
-    void addDiffuseTexture(Texture* diffuseTexture) {
-      if (diffuseTexture != nullptr) {
-        m_diffuseTexture = diffuseTexture;
-      } else {
-        raise::error("texture is null");
-      }
-    }
-
-    void addSpecularTexture(Texture* specularTexture) {
-      if (specularTexture != nullptr) {
-        m_specularTexture = specularTexture;
-      } else {
-        raise::error("texture is null");
-      }
-    }
-
-    void addDiffuseTexture(const std::filesystem::path&);
-    void addSpecularTexture(const std::filesystem::path&);
-
-    // setters
-    void setShininess(float shininess) {
-      m_shininess = shininess;
-    }
+    virtual void set(const std::string& key, std::any value) override;
 
     // accessors
-
     [[nodiscard]]
     auto shininess() const -> float {
       return m_shininess;
@@ -142,23 +117,23 @@ namespace api::material {
 
   class Default : public Normal {
   public:
-    Default(const std::string& name)
-      : Normal(DefaultMaterialId++, MaterialType::Default, name) {}
+    Default(const std::string& name, const config_t& params = {})
+      : Normal(DefaultMaterialId++, MaterialType::Default, name) {
+      configure(params);
+    }
   };
 
   class Emitter : public Material {
     color_t m_color;
 
   public:
-    Emitter(const std::string& name)
-      : Material(EmitterMaterialId++, MaterialType::Emitter, name) {}
+    Emitter(const std::string& name, const config_t& params = {})
+      : Material(EmitterMaterialId++, MaterialType::Emitter, name) {
+      configure(params);
+    }
 
     void shade(const ShaderProgram&) const override;
-
-    // setters
-    void setColor(const color_t& color) {
-      m_color = color;
-    }
+    void set(const std::string&, std::any) override;
 
     // accessors
     [[nodiscard]]

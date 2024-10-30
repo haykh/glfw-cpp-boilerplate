@@ -29,6 +29,23 @@ namespace api::scene {
     glDeleteVertexArrays(1, &m_vao);
   }
 
+  void Scene::addMaterial(Material* p_material) {
+    if (p_material == nullptr) {
+      raise::error("material is null");
+    } else {
+      m_materials.push_back(p_material);
+    }
+  }
+
+  auto Scene::material(unsigned int m) -> Material* {
+    if (m >= m_materials.size()) {
+      raise::error("material index out of bounds");
+      return nullptr;
+    } else {
+      return m_materials[m];
+    }
+  }
+
   void Scene::addMesh(Mesh* p_mesh) {
     m_meshes.push_back(p_mesh);
     glBindVertexArray(m_vao);
@@ -65,8 +82,8 @@ namespace api::scene {
     glBindVertexArray(0);
   }
 
-  void Scene::addLightMesh(Mesh* mesh) {
-    m_light_mesh = mesh;
+  void Scene::addLightMesh(Mesh* p_mesh) {
+    m_light_mesh = p_mesh;
     glBindVertexArray(m_light_vao);
     {
       glBindBuffer(GL_ARRAY_BUFFER, m_light_mesh->vbo());
@@ -92,13 +109,16 @@ namespace api::scene {
       m_meshes.push_back(new mesh::Mesh("lightsource", prefabs::Cube()));
       m_meshes.back()->regenBuffers();
       auto emitter = new material::Emitter("lightsource material");
-      emitter->setColor(p_light->diffuseStrength() > p_light->specularStrength()
-                          ? p_light->diffuseColor()
-                          : p_light->specularColor());
-      m_meshes.back()->setMaterial(emitter);
+      emitter->set("color",
+                   p_light->diffuseStrength() > p_light->specularStrength()
+                     ? p_light->diffuseColor()
+                     : p_light->specularColor());
+      m_meshes.back()->attachMaterial(emitter);
       m_meshes.back()->bindPosition(
         dynamic_cast<Positional*>(p_light)->position_ptr);
-      m_meshes.back()->setScale(vec_t { 0.1f });
+      m_meshes.back()->configure({
+        {"scale", vec_t { 0.1f }}
+      });
     }
   }
 

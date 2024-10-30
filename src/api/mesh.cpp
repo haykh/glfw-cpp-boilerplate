@@ -25,6 +25,70 @@ namespace api::mesh {
     glDeleteBuffers(1, &m_vbo);
   }
 
+  void Mesh::bindPosition(vec_t* const position) {
+    if (position != nullptr) {
+      m_bound_position = position;
+    } else {
+      raise::error("mesh position is null");
+    }
+  }
+
+  void Mesh::bindScale(vec_t* const scale) {
+    if (scale != nullptr) {
+      m_bound_scale = scale;
+    } else {
+      raise::error("mesh scale is null");
+    }
+  }
+
+  void Mesh::bindRotation(transform_t* const rotation) {
+    if (rotation != nullptr) {
+      m_bound_rotation = rotation;
+    } else {
+      raise::error("mesh rotation is null");
+    }
+  }
+
+  void Mesh::set(const std::string& key, std::any value) {
+    if (key == "position") {
+      m_position = std::any_cast<vec_t>(value);
+    } else if (key == "scale") {
+      m_scale = std::any_cast<vec_t>(value);
+    } else if (key == "rotation") {
+      m_rotation = std::any_cast<transform_t>(value);
+    } else {
+      raise::error("invalid key for mesh: " + key);
+    }
+  }
+
+  void Mesh::attachMaterial(Material* material) {
+    if (material != nullptr) {
+      m_material = material;
+    } else {
+      raise::error("mesh material is null");
+    }
+  }
+
+  auto Mesh::transform() const -> transform_t {
+    auto transform_mat = transform_t { 1.0f };
+    if (m_bound_position != nullptr) {
+      transform_mat = glm::translate(transform_mat, *m_bound_position);
+    } else {
+      transform_mat = glm::translate(transform_mat, m_position);
+    }
+    if (m_bound_rotation != nullptr) {
+      transform_mat = transform_mat * *m_bound_rotation;
+    } else {
+      transform_mat = transform_mat * m_rotation;
+    }
+    if (m_bound_scale != nullptr) {
+      transform_mat = glm::scale(transform_mat, *m_bound_scale);
+    } else {
+      transform_mat = glm::scale(transform_mat, m_scale);
+    }
+    return transform_mat;
+  }
+
   void Mesh::identifyMesh(const ShaderProgram& shader) const {
     shader.setUniform1i("mesh_id", id());
   }

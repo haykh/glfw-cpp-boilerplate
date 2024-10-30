@@ -3,6 +3,7 @@
 #include "api/shader.h"
 #include "utils/error.h"
 
+#include <any>
 #include <cstdio>
 #include <filesystem>
 #include <string>
@@ -63,6 +64,20 @@ namespace api::material {
     printf("%s", label().c_str());
   }
 
+  void Normal::set(const std::string& key, std::any value) {
+    if (key == "shininess") {
+      m_shininess = std::any_cast<float>(value);
+    } else if (key == "diffuseTexture") {
+      m_diffuseTexture = new Texture(
+        std::any_cast<std::filesystem::path>(value).generic_string());
+    } else if (key == "specularTexture") {
+      m_specularTexture = new Texture(
+        std::any_cast<std::filesystem::path>(value).generic_string());
+    } else {
+      raise::error("unknown key");
+    }
+  }
+
   void Normal::shade(const ShaderProgram& shader) const {
     Material::shade(shader);
     if (diffuseTexture() != nullptr) {
@@ -76,12 +91,12 @@ namespace api::material {
     shader.setUniform1f(uniformLabel("shininess"), shininess());
   }
 
-  void Normal::addDiffuseTexture(const std::filesystem::path& path) {
-    m_diffuseTexture = new Texture(path.generic_string());
-  }
-
-  void Normal::addSpecularTexture(const std::filesystem::path& path) {
-    m_specularTexture = new Texture(path.generic_string());
+  void Emitter::set(const std::string& key, std::any value) {
+    if (key == "color") {
+      m_color = std::any_cast<color_t>(value);
+    } else {
+      raise::error("unknown key");
+    }
   }
 
   void Emitter::shade(const ShaderProgram& shader) const {

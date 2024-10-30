@@ -1,12 +1,40 @@
 #include "camera.h"
 
+#include "utils/error.h"
+
 #include <GLFW/glfw3.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <any>
 #include <cstdio>
 
 namespace api::camera {
+  using namespace utils;
+
+  void Camera::set(const std::string& key, std::any value) {
+    if (key == "type") {
+      m_type = std::any_cast<CameraType>(value);
+    } else if (key == "position") {
+      m_position = std::any_cast<pos_t>(value);
+    } else if (key == "fov") {
+      m_fov = std::any_cast<float>(value);
+    } else if (key == "aspect") {
+      m_aspect = std::any_cast<float>(value);
+    } else if (key == "zNear") {
+      m_zNear = std::any_cast<float>(value);
+    } else if (key == "zFar") {
+      m_zFar = std::any_cast<float>(value);
+    } else if (key == "yaw") {
+      m_yaw = std::any_cast<float>(value);
+    } else if (key == "pitch") {
+      m_pitch = std::any_cast<float>(value);
+    } else if (key == "roll") {
+      m_roll = std::any_cast<float>(value);
+    } else {
+      raise::error("invalid key for camera: " + key);
+    }
+  }
 
   void Camera::mouseInputCallback(GLFWwindow* win, double xPos, double yPos) {
     static bool  firstMouse = true;
@@ -20,12 +48,12 @@ namespace api::camera {
     }
     float xOffset = (xPos - lastX) * cam->sensitivityX();
     float yOffset = (lastY - yPos) * cam->sensitivityY();
-    cam->setYaw(cam->yaw() + xOffset);
-    cam->setPitch(cam->pitch() + yOffset);
+    cam->set("yaw", cam->yaw() + xOffset);
+    cam->set("pitch", cam->pitch() + yOffset);
     if (cam->pitch() > 89.0f) {
-      cam->setPitch(89.0f);
+      cam->set("pitch", 89.0f);
     } else if (cam->pitch() < -89.0f) {
-      cam->setPitch(-89.0f);
+      cam->set("pitch", -89.0f);
     }
     lastX = xPos;
     lastY = yPos;
@@ -34,26 +62,26 @@ namespace api::camera {
   void Camera::processKeyboardInput(GLFWwindow* window, float dt) {
     const auto norm_speed = speed() * dt;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      setPosition(position() + norm_speed * horizontalFront());
+      set("position", position() + norm_speed * horizontalFront());
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      setPosition(position() - norm_speed * horizontalFront());
+      set("position", position() - norm_speed * horizontalFront());
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-      setPosition(
-        position() -
-        glm::normalize(glm::cross(horizontalFront(), up())) * norm_speed);
+      set("position",
+          position() -
+            glm::normalize(glm::cross(horizontalFront(), up())) * norm_speed);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-      setPosition(
-        position() +
-        glm::normalize(glm::cross(horizontalFront(), up())) * norm_speed);
+      set("position",
+          position() +
+            glm::normalize(glm::cross(horizontalFront(), up())) * norm_speed);
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-      setPosition(position() + 0.5f * norm_speed * WorldUp);
+      set("position", position() + 0.5f * norm_speed * WorldUp);
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-      setPosition(position() - 0.5f * norm_speed * WorldUp);
+      set("position", position() - 0.5f * norm_speed * WorldUp);
     }
   }
 
