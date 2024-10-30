@@ -4,6 +4,7 @@
 #include "utils/error.h"
 
 #include <cstdio>
+#include <filesystem>
 #include <string>
 
 namespace api::material {
@@ -64,9 +65,23 @@ namespace api::material {
 
   void Normal::shade(const ShaderProgram& shader) const {
     Material::shade(shader);
-    shader.setUniform3fv(uniformLabel("diffuseColor"), diffuseColor());
-    shader.setUniform3fv(uniformLabel("specularColor"), specularColor());
+    if (diffuseTexture() != nullptr) {
+      shader.setUniform1i(uniformLabel("diffuseMap"), 0);
+      diffuseTexture()->use(0);
+    }
+    if (specularTexture() != nullptr) {
+      shader.setUniform1i(uniformLabel("specularMap"), 1);
+      specularTexture()->use(1);
+    }
     shader.setUniform1f(uniformLabel("shininess"), shininess());
+  }
+
+  void Normal::addDiffuseTexture(const std::filesystem::path& path) {
+    m_diffuseTexture = new Texture(path.generic_string());
+  }
+
+  void Normal::addSpecularTexture(const std::filesystem::path& path) {
+    m_specularTexture = new Texture(path.generic_string());
   }
 
   void Emitter::shade(const ShaderProgram& shader) const {

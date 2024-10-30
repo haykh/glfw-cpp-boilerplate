@@ -4,11 +4,16 @@
 #include "global.h"
 
 #include "api/shader.h"
+#include "api/texture.h"
+#include "utils/error.h"
 
+#include <filesystem>
 #include <string>
 
 namespace api::material {
   using namespace api::shader;
+  using namespace api::texture;
+  using namespace utils;
 
   enum class MaterialType {
     Default,
@@ -71,43 +76,64 @@ namespace api::material {
   };
 
   class Normal : public Material {
-    color_t m_diffuseColor { 0.7f, 0.7f, 0.7f };
-    color_t m_specularColor { 1.0f, 1.0f, 1.0f };
-    float   m_shininess { 64.0f };
+    float    m_shininess { 64.0f };
+    Texture* m_diffuseTexture { nullptr };
+    Texture* m_specularTexture { nullptr };
 
   public:
     Normal(unsigned int id, MaterialType type, const std::string& name)
       : Material(id, type, name) {}
 
+    ~Normal() {
+      if (m_diffuseTexture != nullptr) {
+        delete m_diffuseTexture;
+      }
+      if (m_specularTexture != nullptr) {
+        delete m_specularTexture;
+      }
+    }
+
     virtual void shade(const ShaderProgram&) const override;
 
+    void addDiffuseTexture(Texture* diffuseTexture) {
+      if (diffuseTexture != nullptr) {
+        m_diffuseTexture = diffuseTexture;
+      } else {
+        raise::error("texture is null");
+      }
+    }
+
+    void addSpecularTexture(Texture* specularTexture) {
+      if (specularTexture != nullptr) {
+        m_specularTexture = specularTexture;
+      } else {
+        raise::error("texture is null");
+      }
+    }
+
+    void addDiffuseTexture(const std::filesystem::path&);
+    void addSpecularTexture(const std::filesystem::path&);
+
     // setters
-    void setDiffuseColor(const color_t& color) {
-      m_diffuseColor = color;
-    }
-
-    void setSpecularColor(const color_t& color) {
-      m_specularColor = color;
-    }
-
     void setShininess(float shininess) {
       m_shininess = shininess;
     }
 
     // accessors
-    [[nodiscard]]
-    auto diffuseColor() const -> color_t {
-      return m_diffuseColor;
-    }
-
-    [[nodiscard]]
-    auto specularColor() const -> color_t {
-      return m_specularColor;
-    }
 
     [[nodiscard]]
     auto shininess() const -> float {
       return m_shininess;
+    }
+
+    [[nodiscard]]
+    auto diffuseTexture() const -> Texture* {
+      return m_diffuseTexture;
+    }
+
+    [[nodiscard]]
+    auto specularTexture() const -> Texture* {
+      return m_specularTexture;
     }
   };
 

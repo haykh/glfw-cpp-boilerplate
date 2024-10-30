@@ -27,6 +27,7 @@ namespace api::mesh {
 
     std::vector<float>        m_vertices;
     std::vector<unsigned int> m_indices;
+    std::vector<float>        m_uvCoords;
     unsigned int              m_vbo;
 
     vec_t       m_position { 0.0f };
@@ -46,16 +47,18 @@ namespace api::mesh {
   public:
     Mesh(const std::string&,
          const std::vector<float>&,
-         const std::vector<unsigned int>&);
+         const std::vector<unsigned int>&,
+         const std::vector<float>&);
 
     Mesh(const std::string& name, const prefabs::Prefab& obj)
-      : Mesh { name, obj.vertices, obj.indices } {}
+      : Mesh { name, obj.vertices, obj.indices, obj.uvCoords } {}
 
     Mesh(Mesh&& other) noexcept
       : m_id { MeshId++ }
       , m_name { std::move(other.m_name) }
       , m_vertices { std::move(other.m_vertices) }
       , m_indices { std::move(other.m_indices) }
+      , m_uvCoords { std::move(other.m_uvCoords) }
       , m_vbo { other.m_vbo }
       , m_buffers_generated { other.m_buffers_generated } {}
 

@@ -46,7 +46,6 @@ namespace engine {
     // shader setup
     const auto   exe_path = path::exeDir();
     scene.addShader("example", exe_path / "shaders");
-    // scene.addLightShader(exe_path / "shaders");
 
     // camera setup
     scene.camera.setAspect(window.aspect());
@@ -60,14 +59,17 @@ namespace engine {
     auto cube = mesh::Mesh("cube", prefabs::Cube());
     cube.regenBuffers();
     material::Default cube_mat("cube material");
-    cube_mat.setShininess(1024.0f);
+    cube_mat.setShininess(32.0f);
+    cube_mat.addDiffuseTexture(exe_path / "assets" / "container2.png");
+    cube_mat.addSpecularTexture(
+      exe_path / "assets" / "container2_specular.png");
     cube.setMaterial(&cube_mat);
 
     auto point_light = light::Point();
     point_light.setPosition(pos_t(1.5f, 1.5f, 2.0f) * 2.0f);
-    point_light.setAmbientStrength(0.0f);
-    point_light.setDiffuseStrength(0.1f);
-    point_light.setSpecularStrength(0.7f);
+    point_light.setAmbientStrength(0.1f);
+    point_light.setDiffuseStrength(0.5f);
+    point_light.setSpecularStrength(1.0f);
     point_light.setSpecularColor({ 1.0f, 0.3f, 0.8f });
 
     auto distant_light = light::Distant();
@@ -78,8 +80,8 @@ namespace engine {
 
     auto spot_light = light::Spotlight();
     spot_light.setAmbientStrength(0.0f);
-    spot_light.setDiffuseStrength(0.5f);
-    spot_light.setSpecularStrength(0.5f);
+    spot_light.setDiffuseStrength(1.0f);
+    spot_light.setSpecularStrength(0.4f);
     spot_light.setDiffuseColor({ 0.2f, 0.2f, 1.0f });
 
     scene.addMesh(&cube);

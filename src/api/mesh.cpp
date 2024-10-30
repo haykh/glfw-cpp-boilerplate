@@ -13,11 +13,13 @@ namespace api::mesh {
 
   Mesh::Mesh(const std::string&               name,
              const std::vector<float>&        vertices,
-             const std::vector<unsigned int>& indices)
+             const std::vector<unsigned int>& indices,
+             const std::vector<float>&        uvCoords)
     : m_id { MeshId++ }
     , m_name { name }
     , m_vertices { vertices }
-    , m_indices { indices } {}
+    , m_indices { indices }
+    , m_uvCoords { uvCoords } {}
 
   Mesh::~Mesh() {
     glDeleteBuffers(1, &m_vbo);
@@ -42,7 +44,7 @@ namespace api::mesh {
   }
 
   auto Mesh::recalculate() const -> std::vector<float> {
-    std::vector<float> vertices(m_indices.size() * 6, 0.0);
+    std::vector<float> vertices(m_indices.size() * 8, 0.0);
     for (auto tidx = 0u; tidx < m_indices.size(); tidx += 3) {
       const auto vidx1 = m_indices[tidx + 0] * 3;
       const auto vidx2 = m_indices[tidx + 1] * 3;
@@ -68,15 +70,17 @@ namespace api::mesh {
             (m_vertices[vidx2 + 1] - m_vertices[vidx3 + 1]) +
           m_vertices[vidx2 + 0] * m_vertices[vidx3 + 1]);
       for (auto vidx = 0u; vidx < 3; vidx++) {
-        vertices[(tidx + vidx) * 6 + 0] =
+        vertices[(tidx + vidx) * 8 + 0] =
           m_vertices[m_indices[tidx + vidx] * 3 + 0];
-        vertices[(tidx + vidx) * 6 + 1] =
+        vertices[(tidx + vidx) * 8 + 1] =
           m_vertices[m_indices[tidx + vidx] * 3 + 1];
-        vertices[(tidx + vidx) * 6 + 2] =
+        vertices[(tidx + vidx) * 8 + 2] =
           m_vertices[m_indices[tidx + vidx] * 3 + 2];
-        vertices[(tidx + vidx) * 6 + 3] = normal.x;
-        vertices[(tidx + vidx) * 6 + 4] = normal.y;
-        vertices[(tidx + vidx) * 6 + 5] = normal.z;
+        vertices[(tidx + vidx) * 8 + 3] = normal.x;
+        vertices[(tidx + vidx) * 8 + 4] = normal.y;
+        vertices[(tidx + vidx) * 8 + 5] = normal.z;
+        vertices[(tidx + vidx) * 8 + 6] = m_uvCoords[(tidx + vidx) * 2 + 0];
+        vertices[(tidx + vidx) * 8 + 7] = m_uvCoords[(tidx + vidx) * 2 + 1];
       }
     }
     return vertices;

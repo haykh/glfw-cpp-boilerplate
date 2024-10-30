@@ -63,7 +63,7 @@ else()
 endif()
 
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/ ${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/include
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/deps ${CMAKE_CURRENT_SOURCE_DIR}/lib/glm)
 
 if(MSVC)

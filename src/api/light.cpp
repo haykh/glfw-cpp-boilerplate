@@ -49,13 +49,13 @@ namespace api::light {
   auto LightSource::shaderCall() const -> std::string {
     if (m_type == LightType::Point) {
       return "result += CalcPointLight(" + label() +
-             ", norm, FragPos, viewDir, activeMat);";
+             ", norm, FragPos, viewDir, defaultMaterial[activeMesh.matIdx]);";
     } else if (m_type == LightType::Distant) {
       return "result += CalcDistantLight(" + label() +
-             ", norm, viewDir, activeMat);";
+             ", norm, viewDir, defaultMaterial[activeMesh.matIdx]);";
     } else if (m_type == LightType::Spotlight) {
       return "result += CalcSpotLight(" + label() +
-             ", norm, FragPos, viewDir, activeMat);";
+             ", norm, FragPos, viewDir, defaultMaterial[activeMesh.matIdx]);";
     } else {
       raise::error("light type not recognized");
       return "";

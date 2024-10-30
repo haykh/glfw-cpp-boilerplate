@@ -7,12 +7,15 @@ namespace prefabs {
 
   struct Prefab {
     Prefab(const std::vector<float>&        vertices,
-           const std::vector<unsigned int>& indices)
+           const std::vector<unsigned int>& indices,
+           const std::vector<float>&        uvCoords)
       : vertices { vertices }
-      , indices { indices } {}
+      , indices { indices }
+      , uvCoords { uvCoords } {}
 
     const std::vector<float>        vertices;
     const std::vector<unsigned int> indices;
+    const std::vector<float>        uvCoords;
   };
 
   struct Cube : public Prefab {
@@ -41,6 +44,20 @@ namespace prefabs {
         6, 7, 3,
         4, 6, 5, // right wall
         4, 7, 6,
+      }, 
+      {
+        0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // left wall
+        1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, // front wall
+        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+        0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // bottom wall
+        0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, // top wall
+        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+        0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // back wall
+        1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, // right wall
+        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f
       }
     } {}
 

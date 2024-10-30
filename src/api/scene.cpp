@@ -40,7 +40,7 @@ namespace api::scene {
                               3,
                               GL_FLOAT,
                               GL_FALSE,
-                              6 * sizeof(float),
+                              8 * sizeof(float),
                               (void*)0);
         glEnableVertexAttribArray(0);
         // normal attribute
@@ -48,9 +48,17 @@ namespace api::scene {
                               3,
                               GL_FLOAT,
                               GL_FALSE,
-                              6 * sizeof(float),
+                              8 * sizeof(float),
                               (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
+        // uv attribute
+        glVertexAttribPointer(2,
+                              2,
+                              GL_FLOAT,
+                              GL_FALSE,
+                              8 * sizeof(float),
+                              (void*)(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
       }
       glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -68,7 +76,7 @@ namespace api::scene {
                               3,
                               GL_FLOAT,
                               GL_FALSE,
-                              6 * sizeof(float),
+                              8 * sizeof(float),
                               (void*)0);
         glEnableVertexAttribArray(0);
       }
@@ -166,30 +174,6 @@ namespace api::scene {
     }
     glBindVertexArray(0);
   }
-
-  // void Scene::renderLights() const {
-  //   m_light_shader.use();
-  //   m_light_shader.setUniformMatrix4fv("view", camera.view());
-  //   m_light_shader.setUniformMatrix4fv("projection", camera.project());
-  //   glBindVertexArray(m_light_vao);
-  //   for (const auto& light : m_positional_lights) {
-  //     if (light == nullptr) {
-  //       log::log(log::WARNING, "light source is null");
-  //     } else {
-  //       auto model = transform_t(1.0f);
-  //       model      = glm::translate(model, light->position());
-  //       model      = glm::scale(model, vec_t(0.1f));
-  //       m_light_shader.setUniformMatrix4fv("model", model);
-  //       if (light->diffuseStrength() > light->specularStrength()) {
-  //         m_light_shader.setUniform3fv("modelColor", light->diffuseColor());
-  //       } else {
-  //         m_light_shader.setUniform3fv("modelColor", light->specularColor());
-  //       }
-  //       m_light_mesh->render(m_light_shader);
-  //     }
-  //   }
-  //   glBindVertexArray(0);
-  // }
 
   void Scene::print() const {
     printf("\n..................\n");

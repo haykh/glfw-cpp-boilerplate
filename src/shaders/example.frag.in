@@ -6,6 +6,7 @@ in vec3 Normal;
 in vec3 FragPos;
 in mat4 ViewMat;
 in vec3 ViewPos;
+in vec2 TexCoords;
 
 struct Mesh {
   // 1 -> default
@@ -15,10 +16,9 @@ struct Mesh {
 };
 
 struct DefaultMaterial {
-  vec3  ambientColor;
-  vec3  diffuseColor;
-  vec3  specularColor;
-  float shininess;
+  sampler2D diffuseMap;
+  sampler2D specularMap;
+  float     shininess;
 };
 
 struct EmitterMaterial {
@@ -107,15 +107,31 @@ void main() {
   vec3 result = vec3(0.0f);
 
   if (activeMesh.matId == 1u) {
-    DefaultMaterial activeMat = defaultMaterial[activeMesh.matIdx];
     // clang-format off /* subst: light calculations */
     // clang-format on
   } else if (activeMesh.matId == 2u) {
-    EmitterMaterial activeMat  = emitterMaterial[activeMesh.matIdx];
-    result                    += activeMat.color;
+    result += emitterMaterial[activeMesh.matIdx].color;
   }
 
   FragColor = vec4(smoothLight(result, 4.0f), 1.0f);
+}
+
+vec3 CombinedLight(float           diff,
+                   float           spec,
+                   vec3            ambientColor,
+                   vec3            diffuseColor,
+                   vec3            specularColor,
+                   float           ambientStrength,
+                   float           diffuseStrength,
+                   float           specularStrength,
+                   DefaultMaterial mat) {
+  vec3 ambient = ambientColor * ambientStrength *
+                 texture(mat.diffuseMap, TexCoords).rgb;
+  vec3 diffuse = diffuseColor * diff * diffuseStrength *
+                 texture(mat.diffuseMap, TexCoords).rgb;
+  vec3 specular = specularColor * spec * specularStrength *
+                  texture(mat.specularMap, TexCoords).rgb;
+  return ambient + diffuse + specular;
 }
 
 // calculates the color when using a point light
@@ -134,13 +150,16 @@ vec3 CalcPointLight(PointLight      light,
   float distance    = length(light.position - fragPos);
   float attenuation = 1.0 / (light.constant + light.linear * distance +
                              light.quadratic * (distance * distance));
-  // combine results
-  vec3  ambient     = light.ambientColor * light.ambientStrength;
-  vec3  diffuse     = light.diffuseColor * diff * light.diffuseStrength *
-                 mat.diffuseColor;
-  vec3 specular = light.specularColor * spec * light.specularStrength *
-                  mat.specularColor;
-  return (ambient + diffuse + specular) * attenuation;
+  return CombinedLight(diff,
+                       spec,
+                       light.ambientColor,
+                       light.diffuseColor,
+                       light.specularColor,
+                       light.ambientStrength,
+                       light.diffuseStrength,
+                       light.specularStrength,
+                       mat) *
+         attenuation;
 }
 
 vec3 CalcDistantLight(DistantLight    light,
@@ -153,13 +172,15 @@ vec3 CalcDistantLight(DistantLight    light,
   // specular shading
   vec3  reflectDir = reflect(-lightDir, normal);
   float spec       = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess);
-  // combine results
-  vec3  ambient    = light.ambientColor * light.ambientStrength;
-  vec3  diffuse    = light.diffuseColor * diff * light.diffuseStrength *
-                 mat.diffuseColor;
-  vec3 specular = light.specularColor * spec * light.specularStrength *
-                  mat.specularColor;
-  return (ambient + diffuse + specular);
+  return CombinedLight(diff,
+                       spec,
+                       light.ambientColor,
+                       light.diffuseColor,
+                       light.specularColor,
+                       light.ambientStrength,
+                       light.diffuseStrength,
+                       light.specularStrength,
+                       mat);
 }
 
 vec3 CalcSpotLight(SpotlightLight  light,
@@ -181,11 +202,15 @@ vec3 CalcSpotLight(SpotlightLight  light,
   float theta       = dot(lightDir, normalize(-light.direction));
   float epsilon     = light.cutOff - light.outerCutOff;
   float intensity   = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-  // combine results
-  vec3  ambient     = light.ambientColor * light.ambientStrength;
-  vec3  diffuse     = light.diffuseColor * diff * light.diffuseStrength *
-                 mat.diffuseColor;
-  vec3 specular = light.specularColor * spec * light.specularStrength *
-                  mat.specularColor;
-  return (ambient + diffuse + specular) * attenuation * intensity;
+
+  return CombinedLight(diff,
+                       spec,
+                       light.ambientColor,
+                       light.diffuseColor,
+                       light.specularColor,
+                       light.ambientStrength,
+                       light.diffuseStrength,
+                       light.specularStrength,
+                       mat) *
+         attenuation * intensity;
 }

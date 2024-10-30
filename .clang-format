@@ -99,7 +99,7 @@ IncludeCategories:
     Priority: 4
   - Regex: '^\<glfw\/.*\.h\>'
     Priority: 5
-  - Regex: '^\<glm.*\.h'
+  - Regex: '^\<[glm|stb].*\.h'
     Priority: 6
   - Regex: "<[[:lower:].|_]+>"
     Priority: 7
